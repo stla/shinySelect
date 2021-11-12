@@ -1,7 +1,42 @@
 import { reactShinyInput } from "reactR";
-import Select from "react-select";
+import Select, { components } from "react-select";
 import parse from "html-react-parser";
 import makeAnimated from "react-select/animated";
+import {
+  SortableContainer,
+  SortableContainerProps,
+  SortableElement,
+  SortEndHandler,
+  SortableHandle,
+} from 'react-sortable-hoc';
+
+
+function arrayMove(array, from, to) {
+  const slicedArray = array.slice();
+  slicedArray.splice(
+    to < 0 ? array.length + to : to,
+    0,
+    slicedArray.splice(from, 1)[0]
+  );
+  return slicedArray;
+}
+
+const SortableMultiValue = SortableElement(
+  (props) => {
+    const onMouseDown = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    const innerProps = { ...props.innerProps, onMouseDown };
+    return <components.MultiValue {...props} innerProps={innerProps} />;
+  }
+);
+
+const SortableMultiValueLabel = SortableHandle(
+  (props) => <components.MultiValueLabel {...props} />
+);
+
+const SortableSelect = SortableContainer(Select)
 
 // -------------------------------------------------------------------------- //
 const isnonnullobject = (x) => {
@@ -39,8 +74,8 @@ const f = (list) => {
       state.isSelected
         ? list["selected"]
         : state.isFocused
-        ? list["focused"]
-        : list["otherwise"];
+          ? list["focused"]
+          : list["otherwise"];
   }
   const key = Object.keys(list)[0];
   if (key === "selected") {
@@ -62,8 +97,9 @@ class SelectControl extends React.PureComponent {
   };
 
   handleChange = (selectedOption) => {
-    this.setState({ selectedOption });
+    this.setState({ selectedOption: selectedOption });
     console.log(`Option selected:`, selectedOption);
+    console.log(this.state.selectedOption);
     if (Array.isArray(selectedOption)) {
       selectedOption = selectedOption.map((x) => x.value);
     } else {
@@ -93,6 +129,7 @@ class SelectControl extends React.PureComponent {
     if (this.props.animated) {
       animatedComponents = makeAnimated();
     }
+    console.log("animatedComponents", animatedComponents);
 
     const customStyles = {
       option: (provided, state) => {
@@ -161,23 +198,90 @@ class SelectControl extends React.PureComponent {
             formatGroupLabel={formatGroupLabel}
             components={animatedComponents}
             isMulti={this.props.isMulti}
+            closeMenuOnSelect={this.props.closeMenuOnSelect}
           />
         </div>
       );
     } else {
-      return (
-        <div className="mt-4 col-md-6 col-offset-4">
-          {labelTag}
-          <Select
-            styles={customStyles}
-            defaultValue={this.props.value}
-            onChange={this.handleChange}
-            options={this.props.options}
-            isMulti={this.props.isMulti}
-            components={animatedComponents}
-          />
-        </div>
-      );
+
+      if (this.props.sortable) {
+
+        //        const [selected, setSelected] = React.useState(this.props.value);
+
+        // const onChange = (selectedOptions) => {
+        //   setSelected(selectedOptions);
+        //   if (Array.isArray(selectedOptions)) {
+        //     selectedOptions = selectedOptions.map((x) => x.value);
+        //   } else {
+        //     selectedOptions = selectedOptions.value;
+        //   }
+        //   this.props.setShinyValue(selectedOptions);
+        // }
+
+        const onSortEnd = ({ oldIndex, newIndex }) => {
+          let newValue = arrayMove(this.state.selectedOption, oldIndex, newIndex);
+          console.log(
+            'Values sorted:',
+            newValue.map((i) => i.value)
+          );
+          //         setSelected(newValue);
+          this.setState({ selectedOption: newValue });
+          if (Array.isArray(newValue)) {
+            newValue = newValue.map((x) => x.value);
+          } else {
+            newValue = newValue.value;
+          }
+          this.props.setShinyValue(newValue);
+        };
+
+        let componentsProp = {
+          MultiValue: SortableMultiValue,
+          MultiValueLabel: SortableMultiValueLabel
+        };
+        if(this.props.animated){
+          componentsProp.MultiValueRemove = animatedComponents.MultiValueRemove;
+        }
+
+        return (
+          <div className={this.props.containerClass}>
+            {labelTag}
+            <SortableSelect
+              useDragHandle
+              // react-sortable-hoc props:
+              axis="xy"
+              onSortEnd={onSortEnd}
+              distance={4}
+              // small fix for https://github.com/clauderic/react-sortable-hoc/pull/352:
+              getHelperDimensions={({ node }) => node.getBoundingClientRect()}
+              // react-select props:
+              styles={customStyles}
+              isMulti
+              options={this.props.options}
+              defaultValue={this.props.value}
+              value={this.state.selectedOption}
+              onChange={this.handleChange}
+              components={componentsProp}
+              closeMenuOnSelect={this.props.closeMenuOnSelect}
+            />
+          </div>
+        );
+
+      } else {
+        return (
+          <div className={this.props.containerClass}>
+            {labelTag}
+            <Select
+              styles={customStyles}
+              defaultValue={this.props.value}
+              onChange={this.handleChange}
+              options={this.props.options}
+              isMulti={this.props.isMulti}
+              components={animatedComponents}
+              closeMenuOnSelect={this.props.closeMenuOnSelect}
+            />
+          </div>
+        );
+      }
     }
   }
 }
@@ -227,8 +331,10 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
       setShinyValue={setValue}
       styles={configuration.styles}
       isMulti={configuration.isMulti}
-      animated={true}
+      sortable={configuration.sortable}
+      animated={configuration.animated}
       displayGroupSizes={configuration.displayGroupSizes}
+      closeMenuOnSelect={configuration.closeMenuOnSelect}
     />
   );
 };

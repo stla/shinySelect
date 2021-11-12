@@ -129,14 +129,21 @@ HTMLchoices <- function(labels, values){
 #' @export
 selectControlInput <- function(
   inputId, label, styles, choices, selected = NULL, multiple=FALSE,
+  sortable = FALSE,
   containerClass = "mt-4 col-md-6 col-offset-4", animated = FALSE,
-  displayGroupSizes = TRUE
+  displayGroupSizes = TRUE, closeMenuOnSelect = !multiple
 ) {
   if(inherits(label, "shiny.tag")){
     label <- HTML(as.character(label))
   }
   if(inherits(label, "html")){
     label <- list("__html" = URLencode(label))
+  }
+  if(sortable && !multiple){
+    warning(
+      "Setting `sortable` has no effect if `multiple = FALSE`."
+    )
+    sortable <- FALSE
   }
   groupedOptions <- areGroupedOptions(choices)
   options <- if(groupedOptions){
@@ -212,12 +219,14 @@ selectControlInput <- function(
       styles = styles,
       grouped = groupedOptions,
       isMulti = multiple,
+      sortable = sortable,
       animated = animated,
       options = options,
       htmlGroups = attr(choices, "htmlgroups"),
       htmlLabels = attr(choices, "htmllabels"),
       selected = selected,
-      displayGroupSizes = displayGroupSizes
+      displayGroupSizes = displayGroupSizes,
+      closeMenuOnSelect = closeMenuOnSelect
     ),
     tags$div
   )
