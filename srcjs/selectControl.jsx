@@ -105,6 +105,7 @@ class SelectControl extends React.PureComponent {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.handleMenuOpen = this.handleMenuOpen.bind(this);
   }
 
   state = {
@@ -123,6 +124,17 @@ class SelectControl extends React.PureComponent {
       selectedOption = selectedOption.value;
     }
     this.props.setShinyValue(selectedOption);
+    $('[data-toggle="tooltip"]').tooltip("hide");
+    setTimeout(function(){$('[data-toggle="tooltip"]').tooltip()});
+  };
+
+  handleMenuOpen = () => {
+    this.setState({ menuIsOpen: true });
+    setTimeout(function(){$('[data-toggle="tooltip"]').tooltip()});
+  };
+
+  componentDidMount() {
+    $('[data-toggle="tooltip"]').tooltip();
   };
 
   render() {
@@ -283,7 +295,7 @@ class SelectControl extends React.PureComponent {
               closeMenuOnSelect={this.props.closeMenuOnSelect}
               filterOption={filterConfig}
               menuIsOpen={this.state.menuIsOpen}
-              onMenuOpen={() => (this.setState({ menuIsOpen: true }))}
+              onMenuOpen={this.handleMenuOpen}
               onMenuClose={() => (this.setState({ menuIsOpen: false }))}
             />
           </div>
@@ -305,7 +317,7 @@ class SelectControl extends React.PureComponent {
               closeMenuOnSelect={this.props.closeMenuOnSelect}
               filterOption={filterConfig}
               menuIsOpen={this.state.menuIsOpen}
-              onMenuOpen={() => (this.setState({ menuIsOpen: true }))}
+              onMenuOpen={this.handleMenuOpen}
               onMenuClose={() => (this.setState({ menuIsOpen: false }))}
             />
           </div>
@@ -362,7 +374,7 @@ class SelectControl extends React.PureComponent {
               closeMenuOnSelect={this.props.closeMenuOnSelect}
               filterOption={filterConfig}
               menuIsOpen={this.state.menuIsOpen}
-              onMenuOpen={() => (this.setState({ menuIsOpen: true }))}
+              onMenuOpen={this.handleMenuOpen}
               onMenuClose={() => (this.setState({ menuIsOpen: false }))}
             />
           </div>
@@ -382,7 +394,7 @@ class SelectControl extends React.PureComponent {
               closeMenuOnSelect={this.props.closeMenuOnSelect}
               filterOption={filterConfig}
               menuIsOpen={this.state.menuIsOpen}
-              onMenuOpen={() => (this.setState({ menuIsOpen: true }))}
+              onMenuOpen={this.handleMenuOpen}
               onMenuClose={() => (this.setState({ menuIsOpen: false }))}
             />
           </div>

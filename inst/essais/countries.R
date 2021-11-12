@@ -9,7 +9,7 @@ L <- lapply(continents, function(continent){
   indices <- Countries[["continentName"]] == continent
   countries <- Countries[["countryName"]][indices]
   pop <- Countries[["population"]][indices]
-  mapply(function(x, y){tags$span(x, title=y)}, countries, pop,
+  mapply(function(x, y){tags$span(x, `data-toggle`="tooltip", title=y)}, countries, pop,
          SIMPLIFY = FALSE, USE.NAMES = FALSE)
 })
 countries <- lapply(continents, function(continent){
@@ -26,14 +26,24 @@ styles <- list(
   backgroundColor = list(selected = "cyan", focused = "orange", otherwise = "seashell")
 )
 
+js <- '
+$(document).ready(function(){
+  $("[data-toggle=tooltip]").tooltip();
+});
+'
+
 ui <- fluidPage(
   theme = bs_theme(version = 4),
+  tags$head(
+    #tags$script(HTML(js))
+  ),
   titlePanel("reactR Input Example"),
-    wellPanel(
-      style="width:100%",
+  sidebarLayout(
+    sidebarPanel(
       selectControlInput(
         "inputid", label = tags$h1("Make a choice", style="color: red;"),
-#        styles = styles,
+        containerClass = NULL,
+        #        styles = styles,
         choices = countries,
         selected = "Tonga",
         multiple = TRUE,
@@ -41,7 +51,9 @@ ui <- fluidPage(
         ignoreCaseOnFilter = FALSE
       ),
       verbatimTextOutput("textOutput")
-    )
+    ),
+    mainPanel()
+  )
 )
 
 server <- function(input, output, session) {
