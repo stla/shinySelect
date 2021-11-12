@@ -72,14 +72,19 @@ isMarkedHTML <- function(x){
   is.list(x) && identical(names(x), "__html")
 }
 
-#' Title
+#' @title KaTeX code
+#' @description Create an object to be decoded by KaTeX.
 #'
-#' @param x
+#' @param x string, some KaTeX code (this is similar to LaTeX)
 #'
-#' @return
+#' @return A list containing the url-encoding of \code{x}.
 #' @export
 #'
-#' @examples
+#' @examples library(shinySelect)
+#' choices <- HTMLchoices(
+#'   values = list("alpha", "beta", "gammma"),
+#'   labels = list(katex("\\alpha"), katex("\\beta"), katex("\\gamma"))
+#' )
 katex <- function(x){
   list("__katex" = URLencode(as.character(x)))
 }
@@ -88,15 +93,44 @@ isKaTeX <- function(x){
   is.list(x) && identical(names(x), "__katex")
 }
 
-#' Title
+
+#' @title Choices with groups and HTML
+#' @description Create an object for grouped choices resorting to HTML.
 #'
-#' @param values
-#' @param names
+#' @param groups list of HTML elements which can be created
+#'   with the \code{\link[htmltools:HTML]{HTML}} function or \code{shiny.tag}
+#'   objects, the headings
+#' @param labels list of lists, one list for each group, made of HTML elements
+#' @param values list of lists of character strings, each label must have a
+#'   value
 #'
-#' @return
+#' @return An object to be passed on to the \code{choices} argument of the
+#'   \code{\link{selectControlInput}} function.
 #' @export
+#' @importFrom utils URLencode
 #'
-#' @examples
+#' @examples library(shinySelect)
+#' states <- HTMLgroupedChoices(
+#'   groups = lapply(list("East Coast", "West Coast", "Midwest"), function(x){
+#'     tags$h2(x, style="text-decoration: underline")
+#'   }),
+#'   labels = list(
+#'     lapply(list("NY", "NJ", "CT"), function(x){
+#'       tags$span(HTML("&bull;"), x, style="color: red")
+#'     }),
+#'     lapply(list("WA", "OR", "CA"), function(x){
+#'       tags$span(HTML("&bull;"), x, style="color: green")
+#'     }),
+#'     lapply(list("MN", "WI", "IA"), function(x){
+#'       tags$span(HTML("&bull;"), x, style="color: blue")
+#'     })
+#'   ),
+#'   values = list(
+#'     list("NY", "NJ", "CT"),
+#'     list("WA", "OR", "CA"),
+#'     list("MN", "WI", "IA")
+#'   )
+#' )
 HTMLgroupedChoices <- function(groups, labels, values){
   groups <- vapply(groups, function(nm){
     URLencode(as.character(nm))
@@ -125,15 +159,32 @@ HTMLgroupedChoices <- function(groups, labels, values){
   out
 }
 
-#' Title
+#' @title Choices with HTML
+#' @description Create an object for choices resorting to HTML.
 #'
-#' @param values
-#' @param names
+#' @param labels the labels of the select control, can be HTML elements created
+#'   with the \code{\link[htmltools:HTML]{HTML}} function or \code{shiny.tag}
+#'   objects such as \code{tags$span(style = "color:lime;", "label")}
+#' @param values the values associated to the labels, they must be character
+#'   strings, given in a vector or in a list
 #'
-#' @return
+#' @return An object (the \code{values} object with some attributes) to be
+#'   passed on to the \code{choices} argument of the
+#'   \code{\link{selectControlInput}} function.
 #' @export
 #'
-#' @examples
+#' @seealso \code{\link{HTMLgroupedChoices}} for choices with groups.
+#'
+#' @examples library(shinySelect)
+#' library(fontawesome)
+#' food <- HTMLchoices(
+#'   labels = list(
+#'     tags$span(fa_i("hamburger"), "Hamburger"),
+#'     tags$span(fa_i("pizza-slice"), "Pizza"),
+#'     tags$span(fa_i("fish"), "Fish")
+#'   ),
+#'   values = list("hamburger", "pizza", "fish")
+#' )
 HTMLchoices <- function(labels, values){
   out <- HTMLgroupedChoices(list("X"), list(labels), list(values))
   a <- attr(out, "htmllabels")
@@ -164,12 +215,13 @@ isNamedList <- function(x){
   is.list(x) && !is.null(names(x)) && all(names(x) != "")
 }
 
-#' Title
+#' @title Toggle a select control widget
+#' @description Toggle (open/close) a select control widget.
 #'
-#' @param session
-#' @param inputId
+#' @param session the Shiny \code{session} object
+#' @param inputId the input id of the select control
 #'
-#' @return
+#' @return No value; called for effect size.
 #' @export
 #'
 #' @examples
@@ -177,6 +229,8 @@ toggleMenu <- function(session, inputId){
   session$sendCustomMessage(paste0("toggleMenu_", inputId), TRUE)
 }
 
+#' @importFrom htmltools htmlDependency
+#' @noRd
 KaTeX_html_dependency <- function(){
   htmlDependency(
     name = "katex",
@@ -190,24 +244,52 @@ KaTeX_html_dependency <- function(){
       defer = ""
     ),
     stylesheet = "katex.min.css"
-    # stylesheet = list(
-    #   href = "katex.min.css",
-    #   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs",
-    #   crossorigin="anonymous"
-    # )
   )
 }
 
-#' <Add Title>
+
+#' @title Select control widget
+#' @description Create a select control widget to be included in a Shiny UI.
 #'
-#' <Add Description>
+#' @param inputId the input slot that will be used to access the value
+#' @param label a label for the widget, can be a HTML element; \code{NULL}
+#'   for no label
+#' @param choices a list of single choices or grouped choices; to use HTML, see
+#'   the functions \code{\link{HTMLchoices}} and \code{\link{HTMLgroupedChoices}}
+#' @param selected the initially selected value; can be \code{NULL} and can be
+#'   a vector or a list of values if \code{multiple = TRUE}
+#' @param multiple Boolean, whether the selection of multiple items is allowed
+#' @param sortable Boolean, whether the multiple selections are sortable
+#' @param optionsStyles styles for the options, given as a list
+#' @param controlStyles styles for the control bar, given as a list
+#' @param multiValueStyles styles for the item boxes when
+#'   \code{multiple = TRUE}, such as the background color
+#' @param multiValueLabelStyles styles for the item labels when
+#'   \code{multiple = TRUE}, such as the font style
+#' @param multiValueRemoveStyles styles for the box containing the cross used
+#'   to remove an item
+#' @param containerClass CSS class(es) for the container; the default value
+#'   assumes you used the 'bslib' package with
+#'   \code{\link[bslib:bs_theme]{bs_theme(version = 4)}}
+#' @param animated Boolean; this has an effect only when \code{multiple = TRUE}:
+#'   the removal of the items is animated
+#' @param displayGroupSizes only for grouped choices, whether to display the
+#'   number of elements of each group
+#' @param closeMenuOnSelect Boolean, whether to close the menu when doing a
+#'   selection
+#' @param ignoreCaseOnFilter Boolean, whether to ignore the case when searching
+#'   an option
+#' @param ignoreAccentsOnFilter Boolean, whether to ignore the accents when
+#'   searchingan option
 #'
+#' @return An input element that can be included in a Shiny UI definition.
+#' @export
 #' @importFrom reactR createReactShinyInput
 #' @importFrom htmltools htmlDependency tags HTML
 #' @importFrom utils URLencode
 #' @importFrom fontawesome fa_html_dependency
 #'
-#' @export
+#' @examples
 selectControlInput <- function(
   inputId, label, choices, selected = NULL, multiple = FALSE,
   sortable = FALSE, optionsStyles = list(), controlStyles = list(),

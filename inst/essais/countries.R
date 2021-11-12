@@ -26,16 +26,30 @@ styles <- list(
   backgroundColor = list(selected = "cyan", focused = "orange", otherwise = "seashell")
 )
 
-js <- '
-$(document).ready(function(){
-  $("[data-toggle=tooltip]").tooltip();
-});
+CSS <- '
+.tooltip {
+  pointer-events: none;
+}
+.tooltip > .tooltip-inner {
+  pointer-events: none;
+  background-color: #73AD21;
+  color: #FFFFFF;
+  border: 1px solid green;
+  padding: 5px;
+  font-size: 15px;
+  text-align: justify;
+  margin-left: 10px;
+  max-width: 1000px;
+}
+.tooltip > .arrow::before {
+  border-top-color: #73AD21;
+}
 '
 
 ui <- fluidPage(
   theme = bs_theme(version = 4),
   tags$head(
-    #tags$script(HTML(js))
+    tags$style(HTML(CSS))
   ),
   titlePanel("reactR Input Example"),
   sidebarLayout(
