@@ -43,6 +43,10 @@ const isnonnullobject = (x) => {
   return x !== null && typeof x === "object";
 };
 
+const isNotEmpty = (obj) => {
+  return Object.keys(obj).length !== 0;
+};
+
 const isHTML = (x) => {
   return isnonnullobject(x) && x.hasOwnProperty("__html");
 };
@@ -112,18 +116,19 @@ class SelectControl extends React.PureComponent {
     const { selectedOption } = this.state;
 
     let obj = {};
-    let styles;
-    if (this.props.styles) {
-      styles = this.props.styles;
-      for (let property in styles) {
-        if (typeof styles[property] === "object") {
-          obj[property] = f(styles[property]);
+    let optionsStyles = {};
+    if (isNotEmpty(this.props.optionsStyles)) {
+      optionsStyles = this.props.optionsStyles;
+      for (let property in optionsStyles) {
+        if (typeof optionsStyles[property] === "object") {
+          obj[property] = f(optionsStyles[property]);
         } else {
-          obj[property] = styles[property];
+          obj[property] = optionsStyles[property];
         }
       }
     }
     console.log("obj", obj);
+    const controlStyles = this.props.controlStyles;
 
     let animatedComponents = null;
     if (this.props.animated) {
@@ -135,8 +140,8 @@ class SelectControl extends React.PureComponent {
       option: (provided, state) => {
         let obj1 = { ...provided };
         let obj2 = {};
-        for (let property in styles) {
-          if (typeof styles[property] === "object") {
+        for (let property in optionsStyles) {
+          if (typeof optionsStyles[property] === "object") {
             obj2[property] = obj[property](state);
           } else {
             obj2[property] = obj[property];
@@ -146,6 +151,7 @@ class SelectControl extends React.PureComponent {
       },
       control: (provided) => ({
         ...provided,
+        ...controlStyles,
         marginTop: "0"
       })
     };
@@ -187,36 +193,7 @@ class SelectControl extends React.PureComponent {
         </div>
       );
 
-      return (
-        <div className={this.props.containerClass}>
-          {labelTag}
-          <Select
-            styles={customStyles}
-            defaultValue={this.props.value}
-            onChange={this.handleChange}
-            options={this.props.options}
-            formatGroupLabel={formatGroupLabel}
-            components={animatedComponents}
-            isMulti={this.props.isMulti}
-            closeMenuOnSelect={this.props.closeMenuOnSelect}
-          />
-        </div>
-      );
-    } else {
-
       if (this.props.sortable) {
-
-        //        const [selected, setSelected] = React.useState(this.props.value);
-
-        // const onChange = (selectedOptions) => {
-        //   setSelected(selectedOptions);
-        //   if (Array.isArray(selectedOptions)) {
-        //     selectedOptions = selectedOptions.map((x) => x.value);
-        //   } else {
-        //     selectedOptions = selectedOptions.value;
-        //   }
-        //   this.props.setShinyValue(selectedOptions);
-        // }
 
         const onSortEnd = ({ oldIndex, newIndex }) => {
           let newValue = arrayMove(this.state.selectedOption, oldIndex, newIndex);
@@ -238,8 +215,80 @@ class SelectControl extends React.PureComponent {
           MultiValue: SortableMultiValue,
           MultiValueLabel: SortableMultiValueLabel
         };
-        if(this.props.animated){
+        if (this.props.animated) {
           componentsProp.MultiValueRemove = animatedComponents.MultiValueRemove;
+        }
+
+        return (
+          <div className={this.props.containerClass}>
+            {labelTag}
+            <SortableSelect
+              useDragHandle
+              // react-sortable-hoc props:
+              axis="xy"
+              onSortEnd={onSortEnd}
+              distance={4}
+              // small fix for https://github.com/clauderic/react-sortable-hoc/pull/352:
+              getHelperDimensions={({ node }) => node.getBoundingClientRect()}
+              // react-select props:
+              styles={customStyles}
+              isMulti
+              options={this.props.options}
+              formatGroupLabel={formatGroupLabel}
+              defaultValue={this.props.value}
+              value={this.state.selectedOption}
+              onChange={this.handleChange}
+              components={componentsProp}
+              closeMenuOnSelect={this.props.closeMenuOnSelect}
+            />
+          </div>
+        );
+
+      } else {
+
+        return (
+          <div className={this.props.containerClass}>
+            {labelTag}
+            <Select
+              styles={customStyles}
+              defaultValue={this.props.value}
+              onChange={this.handleChange}
+              options={this.props.options}
+              formatGroupLabel={formatGroupLabel}
+              components={animatedComponents}
+              isMulti={this.props.isMulti}
+              closeMenuOnSelect={this.props.closeMenuOnSelect}
+            />
+          </div>
+        );
+      }
+    } else { // no groups
+
+      if (this.props.sortable) {
+
+        const onSortEnd = ({ oldIndex, newIndex }) => {
+          let newValue = arrayMove(this.state.selectedOption, oldIndex, newIndex);
+          console.log(
+            'Values sorted:',
+            newValue.map((i) => i.value)
+          );
+          //         setSelected(newValue);
+          this.setState({ selectedOption: newValue });
+          if (Array.isArray(newValue)) {
+            newValue = newValue.map((x) => x.value);
+          } else {
+            newValue = newValue.value;
+          }
+          this.props.setShinyValue(newValue);
+        };
+
+        let componentsProp = {
+          MultiValue: SortableMultiValue,
+          MultiValueLabel: SortableMultiValueLabel
+        };
+        if (this.props.animated) {
+          componentsProp.MultiValueRemove = animatedComponents.MultiValueRemove;
+          componentsProp.MultiValueContainer = animatedComponents.MultiValueContainer;
         }
 
         return (
@@ -293,7 +342,6 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
     label = unescapeHtml(decodeURI(label.__html));
   }
   const grouped = configuration.grouped;
-  //const Tag = grouped ? GroupedSelectControl : SelectControl;
   let selected = configuration.selected;
   if (!Array.isArray(selected)) {
     selected = [selected];
@@ -318,8 +366,11 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
   for (let i = 0; i < selected.length; i++) {
     let group = grouped ? options[selected[i].group].options : options;
     let valueIndices = selected[i].selected;
-    selections = selections.concat(group[valueIndices]);
-    //selections.push(group[valueIndices]);
+    if(Array.isArray(valueIndices)){
+      selections = selections.concat(valueIndices.map((j) => (group[j])));
+    }else{
+      selections.push(group[valueIndices]);
+    }
   }
   return (
     <SelectControl
@@ -329,7 +380,8 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
       options={options}
       value={selections}
       setShinyValue={setValue}
-      styles={configuration.styles}
+      optionsStyles={configuration.optionsStyles}
+      controlStyles={configuration.controlStyles}
       isMulti={configuration.isMulti}
       sortable={configuration.sortable}
       animated={configuration.animated}

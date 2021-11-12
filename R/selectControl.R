@@ -116,6 +116,27 @@ HTMLchoices <- function(labels, values){
   out
 }
 
+`%OR%` <- function(x, y){
+  if(is.null(x) || length(x) == 0) y else x
+}
+
+isBoolean <- function(x){
+  is.logical(x) && (length(x) == 1L) && (!is.na(x))
+}
+
+isString <- function(x){
+  is.character(x) && (length(x) == 1L) && (!is.na(x))
+}
+
+isEmpty <- function(x){
+  tryCatch({
+    length(x) == 0L
+  }, error = function(e) FALSE)
+}
+
+isNamedList <- function(x){
+  is.list(x) && !is.null(names(x)) && all(names(x) != "")
+}
 
 #' <Add Title>
 #'
@@ -128,22 +149,45 @@ HTMLchoices <- function(labels, values){
 #'
 #' @export
 selectControlInput <- function(
-  inputId, label, styles, choices, selected = NULL, multiple=FALSE,
-  sortable = FALSE,
+  inputId, label, choices, selected = NULL, multiple = FALSE,
+  sortable = FALSE, optionsStyles = list(), controlStyles = list(),
   containerClass = "mt-4 col-md-6 col-offset-4", animated = FALSE,
   displayGroupSizes = TRUE, closeMenuOnSelect = !multiple
-) {
+){
+  stopifnot(isBoolean(multiple))
+  stopifnot(isBoolean(sortable))
+  stopifnot(isEmpty(optionsStyles) || isNamedList(optionsStyles))
+  stopifnot(isEmpty(controlStyles) || isNamedList(controlStyles))
+  stopifnot(isBoolean(animated))
+  stopifnot(isBoolean(displayGroupSizes))
+  stopifnot(isBoolean(closeMenuOnSelect))
+  stopifnot(is.null(containerClass) || isString(containerClass))
   if(inherits(label, "shiny.tag")){
     label <- HTML(as.character(label))
   }
   if(inherits(label, "html")){
     label <- list("__html" = URLencode(label))
   }
+  if(!isMarkedHTML(label) && !is.null(label) && !isString(label)){
+    stop(
+      "The `label` argument must be `NULL`, a character string, or a HTML element."
+    )
+  }
   if(sortable && !multiple){
     warning(
       "Setting `sortable` has no effect if `multiple = FALSE`."
     )
     sortable <- FALSE
+  }
+  if(!is.null(selected)){
+    check <- tryCatch({
+      all(vapply(selected, isString, logical(1L)))
+    }, error = function(e) FALSE)
+    if(!check){
+      stop(
+        "The `selected` argument must be a vector or a list of character values."
+      )
+    }
   }
   groupedOptions <- areGroupedOptions(choices)
   options <- if(groupedOptions){
@@ -199,6 +243,7 @@ selectControlInput <- function(
       values <- vapply(options[indices], `[[`, character(1L), "value")
     }
   }
+  emptyNamedList <- `names<-`(list(), character(0L))
   createReactShinyInput(
     inputId,
     "selectControl",
@@ -212,11 +257,12 @@ selectControlInput <- function(
       ),
       fa_html_dependency()
     ),
-    default = list(values),
+    default = as.list(values), # useless!
     list(
       containerClass = containerClass,
       label = label,
-      styles = styles,
+      optionsStyles = optionsStyles %OR% emptyNamedList,
+      controlStyles = controlStyles %OR% emptyNamedList,
       grouped = groupedOptions,
       isMulti = multiple,
       sortable = sortable,
