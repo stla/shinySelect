@@ -4,13 +4,11 @@ import parse from "html-react-parser";
 import makeAnimated from "react-select/animated";
 import {
   SortableContainer,
-  SortableContainerProps,
   SortableElement,
-  SortEndHandler,
   SortableHandle,
 } from 'react-sortable-hoc';
 
-
+// -------------------------------------------------------------------------- //
 function arrayMove(array, from, to) {
   const slicedArray = array.slice();
   slicedArray.splice(
@@ -76,12 +74,6 @@ function formatOptionGroup(data, htmlGroups) {
   }
 }
 
-function formatKaTeX(data) {
-  for (let i = 0; i < data.length; i++) {
-    data[i].label = parse(katex.renderToString(data[i].label));
-  }
-}
-
 const f = (list) => {
   const keys = Object.keys(list);
   if (keys.length === 3) {
@@ -113,11 +105,8 @@ class SelectControl extends React.PureComponent {
     menuIsOpen: false
   };
 
-
   handleChange = (selectedOption) => {
     this.setState({ selectedOption: selectedOption });
-    console.log(`Option selected:`, selectedOption);
-    console.log(this.state.selectedOption);
     if (Array.isArray(selectedOption)) {
       selectedOption = selectedOption.map((x) => x.value);
     } else {
@@ -138,8 +127,6 @@ class SelectControl extends React.PureComponent {
   };
 
   render() {
-    const { selectedOption } = this.state;
-
     const toggleMenuIsOpen = () => {
       const menuIsOpen = this.state.menuIsOpen;
       this.setState({ menuIsOpen: !menuIsOpen });
@@ -163,18 +150,15 @@ class SelectControl extends React.PureComponent {
         }
       }
     }
-    console.log("obj", obj);
     const controlStyles = this.props.controlStyles;
     const multiValueStyles = this.props.multiValueStyles;
     const multiValueLabelStyles = this.props.multiValueLabelStyles;
     const multiValueRemoveStyles = this.props.multiValueRemoveStyles;
 
-
     let animatedComponents = null;
     if (this.props.animated) {
       animatedComponents = makeAnimated();
     }
-    console.log("animatedComponents", animatedComponents);
 
     const customStyles = {
       option: (provided, state) => {
@@ -214,7 +198,7 @@ class SelectControl extends React.PureComponent {
       labelTag = parse(`<label>${this.props.label}</label>`);
     }
 
-    if (this.props.grouped) {
+    if (this.props.grouped) { // case of grouped options -------------------- //
       const groupStyles = {
         display: "flex",
         alignItems: "center",
@@ -246,15 +230,10 @@ class SelectControl extends React.PureComponent {
         </div>
       );
 
-      if (this.props.sortable) {
+      if (this.props.sortable) { // case of sortable items ------------------ //
 
         const onSortEnd = ({ oldIndex, newIndex }) => {
           let newValue = arrayMove(this.state.selectedOption, oldIndex, newIndex);
-          console.log(
-            'Values sorted:',
-            newValue.map((i) => i.value)
-          );
-          //         setSelected(newValue);
           this.setState({ selectedOption: newValue });
           if (Array.isArray(newValue)) {
             newValue = newValue.map((x) => x.value);
@@ -301,7 +280,7 @@ class SelectControl extends React.PureComponent {
           </div>
         );
 
-      } else {
+      } else { // not sortable items ---------------------------------------- //
 
         return (
           <div className={this.props.containerClass}>
@@ -323,17 +302,13 @@ class SelectControl extends React.PureComponent {
           </div>
         );
       }
-    } else { // no groups
 
-      if (this.props.sortable) {
+    } else { // no groups --------------------------------------------------- //
+
+      if (this.props.sortable) { // sortable items -------------------------- //
 
         const onSortEnd = ({ oldIndex, newIndex }) => {
           let newValue = arrayMove(this.state.selectedOption, oldIndex, newIndex);
-          console.log(
-            'Values sorted:',
-            newValue.map((i) => i.value)
-          );
-          //         setSelected(newValue);
           this.setState({ selectedOption: newValue });
           if (Array.isArray(newValue)) {
             newValue = newValue.map((x) => x.value);
@@ -380,7 +355,7 @@ class SelectControl extends React.PureComponent {
           </div>
         );
 
-      } else {
+      } else { // not sortable items ---------------------------------------- //
         return (
           <div className={this.props.containerClass}>
             {labelTag}
@@ -425,14 +400,9 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
         formatOptionGroup(options[i].options, configuration.htmlLabels[i]);
       }
     } else {
-      console.log("else");
-      //for (let i = 0; i < options.length; i++) {
-        formatOptionGroup(options, configuration.htmlLabels);
-      //}
+      formatOptionGroup(options, configuration.htmlLabels);
     }
   }
-  console.log("options", options);
-  //formatKaTeX(options)
   let selections = [];
   for (let i = 0; i < selected.length; i++) {
     let group = grouped ? options[selected[i].group].options : options;
