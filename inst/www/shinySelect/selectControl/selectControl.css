@@ -1,0 +1,4 @@
+div[class$="-menu"][id^="react-select"],
+div[class$="-control"] + div {
+  position: static;
+}

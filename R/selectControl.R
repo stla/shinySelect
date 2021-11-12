@@ -138,6 +138,20 @@ isNamedList <- function(x){
   is.list(x) && !is.null(names(x)) && all(names(x) != "")
 }
 
+#' Title
+#'
+#' @param session
+#' @param inputId
+#'
+#' @return
+#' @export
+#'
+#' @examples
+toggleMenu <- function(session, inputId){
+  session$sendCustomMessage(paste0("toggleMenu_", inputId), TRUE)
+}
+
+
 #' <Add Title>
 #'
 #' <Add Description>
@@ -152,7 +166,8 @@ selectControlInput <- function(
   inputId, label, choices, selected = NULL, multiple = FALSE,
   sortable = FALSE, optionsStyles = list(), controlStyles = list(),
   containerClass = "mt-4 col-md-6 col-offset-4", animated = FALSE,
-  displayGroupSizes = TRUE, closeMenuOnSelect = !multiple
+  displayGroupSizes = TRUE, closeMenuOnSelect = !multiple,
+  ignoreCaseOnFilter = TRUE, ignoreAccentsOnFilter = TRUE
 ){
   stopifnot(isBoolean(multiple))
   stopifnot(isBoolean(sortable))
@@ -162,6 +177,8 @@ selectControlInput <- function(
   stopifnot(isBoolean(displayGroupSizes))
   stopifnot(isBoolean(closeMenuOnSelect))
   stopifnot(is.null(containerClass) || isString(containerClass))
+  stopifnot(isBoolean(ignoreCaseOnFilter))
+  stopifnot(isBoolean(ignoreAccentsOnFilter))
   if(inherits(label, "shiny.tag")){
     label <- HTML(as.character(label))
   }
@@ -253,12 +270,14 @@ selectControlInput <- function(
         version = "1.0.0",
         src = "www/shinySelect/selectControl",
         package = "shinySelect",
-        script = "selectControl.js"
+        script = "selectControl.js",
+        stylesheet = "selectControl.css"
       ),
       fa_html_dependency()
     ),
     default = as.list(values), # useless!
     list(
+      shinyId = inputId,
       containerClass = containerClass,
       label = label,
       optionsStyles = optionsStyles %OR% emptyNamedList,
@@ -272,7 +291,11 @@ selectControlInput <- function(
       htmlLabels = attr(choices, "htmllabels"),
       selected = selected,
       displayGroupSizes = displayGroupSizes,
-      closeMenuOnSelect = closeMenuOnSelect
+      closeMenuOnSelect = closeMenuOnSelect,
+      filterConfig = list(
+        ignoreCase    = ignoreCaseOnFilter,
+        ignoreAccents = ignoreAccentsOnFilter
+      )
     ),
     tags$div
   )

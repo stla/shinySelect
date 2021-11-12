@@ -1,5 +1,5 @@
 import { reactShinyInput } from "reactR";
-import Select, { components } from "react-select";
+import Select, { components, createFilter } from "react-select";
 import parse from "html-react-parser";
 import makeAnimated from "react-select/animated";
 import {
@@ -97,8 +97,10 @@ class SelectControl extends React.PureComponent {
   }
 
   state = {
-    selectedOption: this.props.value
+    selectedOption: this.props.value,
+    menuIsOpen: false
   };
+
 
   handleChange = (selectedOption) => {
     this.setState({ selectedOption: selectedOption });
@@ -114,6 +116,17 @@ class SelectControl extends React.PureComponent {
 
   render() {
     const { selectedOption } = this.state;
+
+    const toggleMenuIsOpen = () => {
+      const menuIsOpen = this.state.menuIsOpen;
+      this.setState({ menuIsOpen: !menuIsOpen });
+    };
+  
+    Shiny.addCustomMessageHandler("toggleMenu_" + this.props.shinyId, function(x){
+      toggleMenuIsOpen();
+    });
+  
+    const filterConfig = createFilter(this.props.filterConfig);
 
     let obj = {};
     let optionsStyles = {};
@@ -240,6 +253,10 @@ class SelectControl extends React.PureComponent {
               onChange={this.handleChange}
               components={componentsProp}
               closeMenuOnSelect={this.props.closeMenuOnSelect}
+              filterOption={filterConfig}
+              menuIsOpen={this.state.menuIsOpen}
+              onMenuOpen={() => (this.setState({ menuIsOpen: true }))}
+              onMenuClose={() => (this.setState({ menuIsOpen: false }))}
             />
           </div>
         );
@@ -258,6 +275,10 @@ class SelectControl extends React.PureComponent {
               components={animatedComponents}
               isMulti={this.props.isMulti}
               closeMenuOnSelect={this.props.closeMenuOnSelect}
+              filterOption={filterConfig}
+              menuIsOpen={this.state.menuIsOpen}
+              onMenuOpen={() => (this.setState({ menuIsOpen: true }))}
+              onMenuClose={() => (this.setState({ menuIsOpen: false }))}
             />
           </div>
         );
@@ -311,6 +332,10 @@ class SelectControl extends React.PureComponent {
               onChange={this.handleChange}
               components={componentsProp}
               closeMenuOnSelect={this.props.closeMenuOnSelect}
+              filterOption={filterConfig}
+              menuIsOpen={this.state.menuIsOpen}
+              onMenuOpen={() => (this.setState({ menuIsOpen: true }))}
+              onMenuClose={() => (this.setState({ menuIsOpen: false }))}
             />
           </div>
         );
@@ -327,6 +352,10 @@ class SelectControl extends React.PureComponent {
               isMulti={this.props.isMulti}
               components={animatedComponents}
               closeMenuOnSelect={this.props.closeMenuOnSelect}
+              filterOption={filterConfig}
+              menuIsOpen={this.state.menuIsOpen}
+              onMenuOpen={() => (this.setState({ menuIsOpen: true }))}
+              onMenuClose={() => (this.setState({ menuIsOpen: false }))}
             />
           </div>
         );
@@ -374,6 +403,7 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
   }
   return (
     <SelectControl
+      shinyId={configuration.shinyId}
       grouped={configuration.grouped}
       containerClass={configuration.containerClass}
       label={label}
@@ -387,6 +417,7 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
       animated={configuration.animated}
       displayGroupSizes={configuration.displayGroupSizes}
       closeMenuOnSelect={configuration.closeMenuOnSelect}
+      filterConfig={configuration.filterConfig}
     />
   );
 };

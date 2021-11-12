@@ -24,17 +24,26 @@ styles <- list(
   backgroundColor = list(selected = "cyan", otherwise = "seashell")
 )
 
+CSS <- '
+div[class$="-menu"][id^="react-select"] {position: static}
+div[class$="-control"] + div {position: static}'
+
 ui <- fluidPage(
   theme = bs_theme(version = 4),
+  # tags$head(
+  #   tags$style(HTML(CSS))
+  # ),
   titlePanel("reactR Input Example"),
   selectControlInput(
     "inputid", label = tags$h1("Make a choice", style="color: red;"),
+    containerClass = NULL,
     optionsStyles = styles,
     choices = states,
-    selected = "NY",
+    selected = list("NY", "CT"),
     multiple = TRUE,
+    sortable = TRUE,
     animated = TRUE,
-    sortable = TRUE
+    ignoreCaseOnFilter = FALSE
   ),
   verbatimTextOutput("textOutput"),
   actionButton("toggle", "Toggle menu")
@@ -50,6 +59,7 @@ server <- function(input, output, session) {
   observeEvent(input[["toggle"]], {
     toggleMenu(session, "inputid")
   })
+
 }
 
 shinyApp(ui, server)

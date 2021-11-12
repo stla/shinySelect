@@ -33,11 +33,12 @@ ui <- fluidPage(
       style="width:100%",
       selectControlInput(
         "inputid", label = tags$h1("Make a choice", style="color: red;"),
-        styles = styles,
+#        styles = styles,
         choices = countries,
         selected = "Tonga",
         multiple = TRUE,
-        animated = TRUE
+        animated = TRUE,
+        ignoreCaseOnFilter = FALSE
       ),
       verbatimTextOutput("textOutput")
     )
