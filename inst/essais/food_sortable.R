@@ -32,7 +32,8 @@ ui <- fluidPage(
     selected = "hamburger",
     multiple = TRUE,
     sortable = TRUE,
-    animated = TRUE
+    animated = TRUE,
+    ignoreCaseOnFilter = FALSE
   ),
   br(),
   verbatimTextOutput("textOutput")

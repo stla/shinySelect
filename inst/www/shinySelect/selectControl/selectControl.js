@@ -15854,13 +15854,12 @@ var isKaTeX = function isKaTeX(x) {
 function formatOptionGroup(data, htmlGroups) {
   for (var i = 0; i < data.length; i++) {
     var toparse = htmlGroups[i];
-    console.log("toparse", toparse);
 
     if (isKaTeX(toparse)) {
       data[i].label = Object(html_react_parser__WEBPACK_IMPORTED_MODULE_2__["default"])(katex.renderToString(decodeURI(toparse.__katex)));
-      console.log("label", data[i].label);
     } else {
       data[i].label = Object(html_react_parser__WEBPACK_IMPORTED_MODULE_2__["default"])(unescapeHtml(decodeURI(toparse)));
+      console.log(data[i].label);
     }
   }
 }
@@ -15885,6 +15884,23 @@ var f = function f(list) {
       return state.isFocused ? list[key] : list["otherwise"];
     };
   }
+};
+
+var getStrings = function getStrings(option) {
+  var label = option.label;
+
+  if (typeof label === "string") {
+    return label;
+  }
+
+  if (React.isValidElement(label)) {
+    var strings = label.props.children.filter(function (x) {
+      return typeof x === "string";
+    });
+    return strings.join(" ");
+  }
+
+  return "";
 }; // -------------------------------------------------------------------------- //
 
 
@@ -15962,7 +15978,10 @@ var SelectControl = /*#__PURE__*/function (_React$PureComponent) {
       Shiny.addCustomMessageHandler("toggleMenu_" + this.props.shinyId, function (x) {
         toggleMenuIsOpen();
       });
-      var filterConfig = Object(react_select__WEBPACK_IMPORTED_MODULE_1__["createFilter"])(this.props.filterConfig);
+      var filterConfig = Object(react_select__WEBPACK_IMPORTED_MODULE_1__["createFilter"])($.extend(this.props.filterConfig, {
+        stringify: getStrings
+      }));
+      console.log(filterConfig);
       var obj = {};
       var optionsStyles = {};
 

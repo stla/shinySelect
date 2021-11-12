@@ -64,12 +64,11 @@ const isKaTeX = (x) => {
 function formatOptionGroup(data, htmlGroups) {
   for (let i = 0; i < data.length; i++) {
     let toparse = htmlGroups[i];
-    console.log("toparse", toparse);
     if(isKaTeX(toparse)){
       data[i].label = parse(katex.renderToString(decodeURI(toparse.__katex)));
-      console.log("label", data[i].label);
     }else{
       data[i].label = parse(unescapeHtml(decodeURI(toparse)));
+      console.log(data[i].label);
     }
   }
 }
@@ -90,6 +89,18 @@ const f = (list) => {
   } else {
     return (state) => (state.isFocused ? list[key] : list["otherwise"]);
   }
+};
+
+const getStrings = (option) => {
+  const label = option.label;
+  if(typeof label === "string"){
+    return label;
+  }
+  if(React.isValidElement(label)){
+    const strings = label.props.children.filter(x => typeof x === "string");
+    return strings.join(" ");
+  }
+  return "";
 };
 
 // -------------------------------------------------------------------------- //
@@ -136,8 +147,10 @@ class SelectControl extends React.PureComponent {
       toggleMenuIsOpen();
     });
   
-    const filterConfig = createFilter(this.props.filterConfig);
-
+    const filterConfig = createFilter(
+      $.extend(this.props.filterConfig, {stringify: getStrings})
+    );
+console.log(filterConfig);
     let obj = {};
     let optionsStyles = {};
     if (isNotEmpty(this.props.optionsStyles)) {
