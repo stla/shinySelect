@@ -2,7 +2,9 @@
 
 export(HTMLchoices)
 export(HTMLgroupedChoices)
+export(katex)
 export(selectControlInput)
+export(toggleMenu)
 export(updateSelectControlInput)
 importFrom(fontawesome,fa_html_dependency)
 importFrom(htmltools,HTML)

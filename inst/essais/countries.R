@@ -1,29 +1,28 @@
 library(shiny)
-library(shinySelect)
 library(bslib)
-library(fontawesome)
+library(shinySelect)
 
 data(Countries, package = "jsTreeR")
+
 continents <- unique(Countries[["continentName"]])
+
 L <- lapply(continents, function(continent){
   indices <- Countries[["continentName"]] == continent
   countries <- Countries[["countryName"]][indices]
   pop <- Countries[["population"]][indices]
-  mapply(function(x, y){tags$span(x, `data-toggle`="tooltip", title=y)}, countries, pop,
-         SIMPLIFY = FALSE, USE.NAMES = FALSE)
+  mapply(function(x, y){tags$span(x, `data-toggle`="tooltip", title=y)},
+         countries, pop, SIMPLIFY = FALSE, USE.NAMES = FALSE)
 })
+
 countries <- lapply(continents, function(continent){
   indices <- Countries[["continentName"]] == continent
   Countries[["countryName"]][indices]
 })
+
 countries <- HTMLgroupedChoices(
   groups = lapply(continents, function(nm) tags$h2(nm, style="color: blue;")),
   labels = L,
   values = countries
-)
-
-styles <- list(
-  backgroundColor = list(selected = "cyan", focused = "orange", otherwise = "seashell")
 )
 
 CSS <- '
@@ -51,31 +50,28 @@ ui <- fluidPage(
   tags$head(
     tags$style(HTML(CSS))
   ),
-  titlePanel("reactR Input Example"),
+  titlePanel("Tooltips example"),
   sidebarLayout(
     sidebarPanel(
       selectControlInput(
-        "inputid", label = tags$h1("Make a choice", style="color: red;"),
+        "select",
+        label = tags$h3("Choose some countries", style="color: red;"),
         containerClass = NULL,
-        #        styles = styles,
         choices = countries,
-        selected = "Tonga",
+        selected = c("Tonga", "Austria"),
         multiple = TRUE,
-        animated = TRUE,
-        ignoreCaseOnFilter = FALSE
-      ),
-      verbatimTextOutput("textOutput")
+        animated = TRUE
+      )
     ),
-    mainPanel()
+    mainPanel(
+      verbatimTextOutput("textOutput")
+    )
   )
 )
 
 server <- function(input, output, session) {
-  observe({
-    print(input$inputid)
-  })
-  output$textOutput <- renderPrint({
-    sprintf("You selected: %s", input$inputid)
+  output[["textOutput"]] <- renderPrint({
+    sprintf("You selected: %s.", toString(input[["select"]]))
   })
 }
 

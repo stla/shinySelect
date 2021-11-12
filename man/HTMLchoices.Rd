@@ -2,22 +2,38 @@
 % Please edit documentation in R/selectControl.R
 \name{HTMLchoices}
 \alias{HTMLchoices}
-\title{Title}
+\title{Choices with HTML}
 \usage{
-HTMLchoices(values, names)
-
-HTMLchoices(values, names)
+HTMLchoices(labels, values)
 }
 \arguments{
-\item{names}{}
+\item{labels}{the labels of the select control, can be HTML elements created
+with the \code{\link[htmltools:HTML]{HTML}} function or \code{shiny.tag}
+objects such as \code{tags$span(style = "color:lime;", "label")}}
+
+\item{values}{the values associated to the labels, they must be character
+strings, given in a vector or in a list}
 }
 \value{
-
-
-
+An object (the \code{values} object with some attributes) to be
+  passed on to the \code{choices} argument of the
+  \code{\link{selectControlInput}} function.
 }
 \description{
-Title
-
-Title
+Create an object for choices resorting to HTML.
+}
+\examples{
+library(shinySelect)
+library(fontawesome)
+food <- HTMLchoices(
+  labels = list(
+    tags$span(fa_i("hamburger"), "Hamburger"),
+    tags$span(fa_i("pizza-slice"), "Pizza"),
+    tags$span(fa_i("fish"), "Fish")
+  ),
+  values = list("hamburger", "pizza", "fish")
+)
+}
+\seealso{
+\code{\link{HTMLgroupedChoices}} for choices with groups.
 }

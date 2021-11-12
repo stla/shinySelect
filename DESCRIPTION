@@ -15,4 +15,5 @@ Imports:
     utils,
     fontawesome
 Suggests:
-    bslib
+    bslib,
+    jsTreeR

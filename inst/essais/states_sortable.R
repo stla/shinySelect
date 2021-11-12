@@ -1,7 +1,5 @@
 library(shiny)
 library(shinySelect)
-library(bslib)
-library(fontawesome)
 
 states <- HTMLgroupedChoices(
   groups = lapply(list("East Coast", "West Coast", "Midwest"), function(x){
@@ -25,7 +23,6 @@ states <- HTMLgroupedChoices(
   )
 )
 
-
 styles <- list(
   borderBottom = "2px dotted orange",
   backgroundColor = list(
@@ -36,6 +33,7 @@ styles <- list(
 )
 controlStyles = list(
   marginTop = "0",
+  marginRight = "50px",
   boxShadow = toString(c(
     "rgba(50, 50, 93, 0.25) 0px 50px 100px -20px",
     "rgba(0, 0, 0, 0.3) 0px 30px 60px -30px",
@@ -60,46 +58,46 @@ multiValueRemoveStyles = list(
 CSS <- '
 div[class$="-group"][id^="react-select"][id$="-heading"] {
   background: #0F2027;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to right, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);
+  background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
 }'
 
 ui <- fluidPage(
-  theme = bs_theme(version = 4),
   tags$head(
     tags$style(HTML(CSS))
   ),
-  titlePanel("reactR Input Example"),
-  selectControlInput(
-    "inputid", label = tags$h1("Make a choice", style="color: red;"),
-    optionsStyles = styles,
-    controlStyles = controlStyles,
-    multiValueStyles = multiValueStyles,
-    multiValueLabelStyles = multiValueLabelStyles,
-    multiValueRemoveStyles = multiValueRemoveStyles,
-    choices = states,
-    selected = list("NY", "CT"),
-    multiple = TRUE,
-    sortable = TRUE,
-    animated = TRUE,
-    ignoreCaseOnFilter = FALSE
-  ),
-  br(),
-  verbatimTextOutput("textOutput"),
-  actionButton("toggle", "Toggle menu")
+  titlePanel("Custom styles example"),
+  splitLayout(
+    selectControlInput(
+      "select",
+      label = tags$h1("Choose some states", style="color: red;"),
+      containerClass = NULL,
+      optionsStyles = styles,
+      controlStyles = controlStyles,
+      multiValueStyles = multiValueStyles,
+      multiValueLabelStyles = multiValueLabelStyles,
+      multiValueRemoveStyles = multiValueRemoveStyles,
+      choices = states,
+      selected = list("NY", "CT"),
+      multiple = TRUE,
+      sortable = TRUE,
+      animated = TRUE
+    ),
+    tagList(
+      verbatimTextOutput("textOutput"),
+      br(),
+      actionButton("toggle", "Toggle menu", class = "btn-primary")
+    )
+  )
 )
 
 server <- function(input, output, session) {
-  observe({
-    print(input$inputid)
-  })
-  output$textOutput <- renderPrint({
-    sprintf("You selected: %s", toString(input$inputid))
+  output[["textOutput"]] <- renderPrint({
+    sprintf("You selected: %s.", toString(input[["select"]]))
   })
   observeEvent(input[["toggle"]], {
-    toggleMenu(session, "inputid")
+    toggleMenu(session, "select")
   })
-
 }
 
 shinyApp(ui, server)

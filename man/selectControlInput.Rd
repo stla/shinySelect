@@ -2,20 +2,356 @@
 % Please edit documentation in R/selectControl.R
 \name{selectControlInput}
 \alias{selectControlInput}
-\title{<Add Title>}
+\title{Select control widget}
 \usage{
 selectControlInput(
   inputId,
   label,
-  styles,
   choices,
   selected = NULL,
   multiple = FALSE,
+  sortable = FALSE,
+  optionsStyles = list(),
+  controlStyles = list(),
+  multiValueStyles = list(),
+  multiValueLabelStyles = list(),
+  multiValueRemoveStyles = list(),
   containerClass = "mt-4 col-md-6 col-offset-4",
   animated = FALSE,
-  displayGroupSizes = TRUE
+  displayGroupSizes = TRUE,
+  closeMenuOnSelect = !multiple,
+  ignoreCaseOnFilter = TRUE,
+  ignoreAccentsOnFilter = TRUE
 )
 }
+\arguments{
+\item{inputId}{the input slot that will be used to access the value}
+
+\item{label}{a label for the widget, can be a HTML element; \code{NULL}
+for no label}
+
+\item{choices}{a list of single choices or grouped choices; to use HTML, see
+the functions \code{\link{HTMLchoices}} and \code{\link{HTMLgroupedChoices}}}
+
+\item{selected}{the initially selected value; can be \code{NULL} and can be
+a vector or a list of values if \code{multiple = TRUE}}
+
+\item{multiple}{Boolean, whether the selection of multiple items is allowed}
+
+\item{sortable}{Boolean, whether the multiple selections are sortable}
+
+\item{optionsStyles}{styles for the options, given as a list}
+
+\item{controlStyles}{styles for the control bar, given as a list}
+
+\item{multiValueStyles}{styles for the item boxes when
+\code{multiple = TRUE}, such as the background color}
+
+\item{multiValueLabelStyles}{styles for the item labels when
+\code{multiple = TRUE}, such as the font style}
+
+\item{multiValueRemoveStyles}{styles for the box containing the cross used
+to remove an item}
+
+\item{containerClass}{CSS class(es) for the container; the default value
+assumes you used the 'bslib' package with
+\code{\link[bslib:bs_theme]{bs_theme(version = 4)}}}
+
+\item{animated}{Boolean; this has an effect only when \code{multiple = TRUE}:
+the removal of the items is animated}
+
+\item{displayGroupSizes}{only for grouped choices, whether to display the
+number of elements of each group}
+
+\item{closeMenuOnSelect}{Boolean, whether to close the menu when doing a
+selection}
+
+\item{ignoreCaseOnFilter}{Boolean, whether to ignore the case when searching
+an option}
+
+\item{ignoreAccentsOnFilter}{Boolean, whether to ignore the accents when
+searchingan option}
+}
+\value{
+An input element that can be included in a Shiny UI definition.
+}
 \description{
-<Add Description>
+Create a select control widget to be included in a Shiny UI.
+}
+\examples{
+# an example using KaTeX ####
+library(shiny)
+library(shinySelect)
+library(bslib)
+
+choices <- HTMLchoices(
+  values = list("alpha", "beta", "gammma"),
+  labels = list(katex("\\\\alpha"), katex("\\\\beta"), katex("\\\\gamma"))
+)
+
+ui <- fluidPage(
+  theme = bs_theme(version = 4),
+  titlePanel("KaTeX example"),
+  selectControlInput(
+    "select",
+    label = tags$h1("Make a choice", style="color: red;"),
+    choices = choices,
+    selected = "alpha",
+    multiple = FALSE,
+    animated = TRUE
+  ),
+  br(),
+  verbatimTextOutput("textOutput")
+)
+
+server <- function(input, output, session) {
+  output[["textOutput"]] <- renderPrint({
+    sprintf("You selected: \%s.", input[["select"]])
+  })
+}
+
+if(interactive()){
+  shinyApp(ui, server)
+}
+
+# An example of `sortable = TRUE`, with fontawesome icons ####
+library(shiny)
+library(shinySelect)
+library(bslib)
+library(fontawesome)
+
+food <- HTMLchoices(
+  labels = list(
+    tags$span(fa_i("hamburger"), "Hamburger"),
+    tags$span(fa_i("pizza-slice"), "Pizza"),
+    tags$span(fa_i("fish"), "Fish")
+  ),
+  values = list("hamburger", "pizza", "fish")
+)
+
+styles <- list(
+  borderBottom = "2px solid orange",
+  backgroundColor = list(
+    selected = "cyan",
+    focused = "lemonchiffon",
+    otherwise = "seashell"
+  )
+)
+
+ui <- fluidPage(
+  theme = bs_theme(version = 4),
+  titlePanel("Sortable example"),
+  selectControlInput(
+    "select",
+    label = tags$h1("Make a choice", style="color: red;"),
+    optionsStyles = styles,
+    choices = food,
+    selected = "hamburger",
+    multiple = TRUE,
+    sortable = TRUE,
+    animated = TRUE
+  ),
+  br(),
+  verbatimTextOutput("textOutput")
+)
+
+server <- function(input, output, session) {
+  output[["textOutput"]] <- renderPrint({
+    sprintf("You selected: \%s.", toString(input[["select"]]))
+  })
+}
+
+if(interactive()){
+  shinyApp(ui, server)
+}
+
+# An example with tooltips ####
+library(shiny)
+library(bslib)
+library(shinySelect)
+
+data(Countries, package = "jsTreeR")
+
+continents <- unique(Countries[["continentName"]])
+
+L <- lapply(continents, function(continent){
+  indices <- Countries[["continentName"]] == continent
+  countries <- Countries[["countryName"]][indices]
+  pop <- Countries[["population"]][indices]
+  mapply(function(x, y){tags$span(x, `data-toggle`="tooltip", title=y)},
+         countries, pop, SIMPLIFY = FALSE, USE.NAMES = FALSE)
+})
+
+countries <- lapply(continents, function(continent){
+  indices <- Countries[["continentName"]] == continent
+  Countries[["countryName"]][indices]
+})
+
+countries <- HTMLgroupedChoices(
+  groups = lapply(continents, function(nm) tags$h2(nm, style="color: blue;")),
+  labels = L,
+  values = countries
+)
+
+CSS <- '
+.tooltip {
+  pointer-events: none;
+}
+.tooltip > .tooltip-inner {
+  pointer-events: none;
+  background-color: #73AD21;
+  color: #FFFFFF;
+  border: 1px solid green;
+  padding: 5px;
+  font-size: 15px;
+  text-align: justify;
+  margin-left: 10px;
+  max-width: 1000px;
+}
+.tooltip > .arrow::before {
+  border-top-color: #73AD21;
+}
+'
+
+ui <- fluidPage(
+  theme = bs_theme(version = 4),
+  tags$head(
+    tags$style(HTML(CSS))
+  ),
+  titlePanel("Tooltips example"),
+  sidebarLayout(
+    sidebarPanel(
+      selectControlInput(
+        "select",
+        label = tags$h3("Choose some countries", style="color: red;"),
+        containerClass = NULL,
+        choices = countries,
+        selected = c("Tonga", "Austria"),
+        multiple = TRUE,
+        animated = TRUE
+      )
+    ),
+    mainPanel(
+      verbatimTextOutput("textOutput")
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  output[["textOutput"]] <- renderPrint({
+    sprintf("You selected: \%s.", toString(input[["select"]]))
+  })
+}
+
+if(interactive()){
+  shinyApp(ui, server)
+}
+
+
+# An example of custom styles ####
+library(shiny)
+library(shinySelect)
+
+states <- HTMLgroupedChoices(
+  groups = lapply(list("East Coast", "West Coast", "Midwest"), function(x){
+    tags$h2(x, style="text-decoration: underline")
+  }),
+  labels = list(
+    lapply(list("NY", "NJ", "CT"), function(x){
+      tags$span(HTML("&bull;"), x, style="color: red")
+    }),
+    lapply(list("WA", "OR", "CA"), function(x){
+      tags$span(HTML("&bull;"), x, style="color: green")
+    }),
+    lapply(list("MN", "WI", "IA"), function(x){
+      tags$span(HTML("&bull;"), x, style="color: blue")
+    })
+  ),
+  values = list(
+    list("NY", "NJ", "CT"),
+    list("WA", "OR", "CA"),
+    list("MN", "WI", "IA")
+  )
+)
+
+styles <- list(
+  borderBottom = "2px dotted orange",
+  backgroundColor = list(
+    selected = "cyan",
+    focused = "lemonchiffon",
+    otherwise = "seashell"
+  )
+)
+controlStyles = list(
+  marginTop = "0",
+  marginRight = "50px",
+  boxShadow = toString(c(
+    "rgba(50, 50, 93, 0.25) 0px 50px 100px -20px",
+    "rgba(0, 0, 0, 0.3) 0px 30px 60px -30px",
+    "rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;"
+  ))
+)
+multiValueStyles = list(
+  backgroundColor = "lavenderblush"
+)
+multiValueLabelStyles = list(
+  fontStyle = "italic",
+  fontWeight = "bold"
+)
+multiValueRemoveStyles = list(
+  color = "hotpink",
+  ":hover" = list(
+    backgroundColor = "navy",
+    color = "white"
+  )
+)
+
+CSS <- '
+div[class$="-group"][id^="react-select"][id$="-heading"] {
+  background: #0F2027;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);
+  background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+}'
+
+ui <- fluidPage(
+  tags$head(
+    tags$style(HTML(CSS))
+  ),
+  titlePanel("Custom styles example"),
+  splitLayout(
+    selectControlInput(
+      "select",
+      label = tags$h1("Choose some states", style="color: red;"),
+      containerClass = NULL,
+      optionsStyles = styles,
+      controlStyles = controlStyles,
+      multiValueStyles = multiValueStyles,
+      multiValueLabelStyles = multiValueLabelStyles,
+      multiValueRemoveStyles = multiValueRemoveStyles,
+      choices = states,
+      selected = list("NY", "CT"),
+      multiple = TRUE,
+      sortable = TRUE,
+      animated = TRUE
+    ),
+    tagList(
+      verbatimTextOutput("textOutput"),
+      br(),
+      actionButton("toggle", "Toggle menu", class = "btn-primary")
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  output[["textOutput"]] <- renderPrint({
+    sprintf("You selected: \%s.", toString(input[["select"]]))
+  })
+  observeEvent(input[["toggle"]], {
+    toggleMenu(session, "select")
+  })
+}
+
+if(interactive()){
+  shinyApp(ui, server)
+}
 }

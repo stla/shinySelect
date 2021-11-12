@@ -2,16 +2,48 @@
 % Please edit documentation in R/selectControl.R
 \name{HTMLgroupedChoices}
 \alias{HTMLgroupedChoices}
-\title{Title}
+\title{Choices with groups and HTML}
 \usage{
 HTMLgroupedChoices(groups, labels, values)
 }
 \arguments{
-\item{names}{}
+\item{groups}{list of HTML elements which can be created
+with the \code{\link[htmltools:HTML]{HTML}} function or \code{shiny.tag}
+objects, the headings}
+
+\item{labels}{list of lists, one list for each group, made of HTML elements}
+
+\item{values}{list of lists of character strings, each label must have a
+value}
 }
 \value{
-
+An object to be passed on to the \code{choices} argument of the
+  \code{\link{selectControlInput}} function.
 }
 \description{
-Title
+Create an object for grouped choices resorting to HTML.
+}
+\examples{
+library(shinySelect)
+states <- HTMLgroupedChoices(
+  groups = lapply(list("East Coast", "West Coast", "Midwest"), function(x){
+    tags$h2(x, style="text-decoration: underline")
+  }),
+  labels = list(
+    lapply(list("NY", "NJ", "CT"), function(x){
+      tags$span(HTML("&bull;"), x, style="color: red")
+    }),
+    lapply(list("WA", "OR", "CA"), function(x){
+      tags$span(HTML("&bull;"), x, style="color: green")
+    }),
+    lapply(list("MN", "WI", "IA"), function(x){
+      tags$span(HTML("&bull;"), x, style="color: blue")
+    })
+  ),
+  values = list(
+    list("NY", "NJ", "CT"),
+    list("WA", "OR", "CA"),
+    list("MN", "WI", "IA")
+  )
+)
 }
