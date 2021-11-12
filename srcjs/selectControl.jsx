@@ -59,9 +59,20 @@ function unescapeHtml(html) {
   });
 }
 
+const isKaTeX = (x) => {
+  return isnonnullobject(x) && x.hasOwnProperty("__katex");
+};
+
 function formatOptionGroup(data, htmlGroups) {
   for (let i = 0; i < data.length; i++) {
-    data[i].label = parse(unescapeHtml(decodeURI(htmlGroups[i])));
+    let toparse = htmlGroups[i];
+    console.log("toparse", toparse);
+    if(isKaTeX(toparse)){
+      data[i].label = parse(katex.renderToString(decodeURI(toparse.__katex)));
+      console.log("label", data[i].label);
+    }else{
+      data[i].label = parse(unescapeHtml(decodeURI(toparse)));
+    }
   }
 }
 
@@ -402,11 +413,13 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
         formatOptionGroup(options[i].options, configuration.htmlLabels[i]);
       }
     } else {
-      for (let i = 0; i < options.length; i++) {
+      console.log("else");
+      //for (let i = 0; i < options.length; i++) {
         formatOptionGroup(options, configuration.htmlLabels);
-      }
+      //}
     }
   }
+  console.log("options", options);
   //formatKaTeX(options)
   let selections = [];
   for (let i = 0; i < selected.length; i++) {

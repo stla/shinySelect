@@ -72,6 +72,21 @@ isMarkedHTML <- function(x){
   is.list(x) && identical(names(x), "__html")
 }
 
+#' Title
+#'
+#' @param x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+katex <- function(x){
+  list("__katex" = URLencode(as.character(x)))
+}
+
+isKaTeX <- function(x){
+  is.list(x) && identical(names(x), "__katex")
+}
 
 #' Title
 #'
@@ -86,16 +101,27 @@ HTMLgroupedChoices <- function(groups, labels, values){
   groups <- vapply(groups, function(nm){
     URLencode(as.character(nm))
   }, character(1L))
-  labels <- lapply(labels, function(labelist){
+  newlabels <- lapply(labels, function(labelist){
     vapply(labelist, function(label){
-      URLencode(as.character(label))
+      if(isKaTeX(label)){
+        NA_character_
+      }else{
+        URLencode(as.character(label))
+      }
     }, character(1L))
   })
+  for(i in seq_along(newlabels)){
+    for(j in seq_along(newlabels[[i]])){
+      if(is.na(newlabels[[i]][[j]])){
+        newlabels[[i]][[j]] <- labels[[i]][[j]]
+      }
+    }
+  }
   names(values) <- as.character(seq_along(values))
   #names(labels) <- as.character(seq_along(labels))
   out <- values
   attr(out, "htmlgroups") <- groups
-  attr(out, "htmllabels") <- labels
+  attr(out, "htmllabels") <- newlabels
   out
 }
 
@@ -151,6 +177,26 @@ toggleMenu <- function(session, inputId){
   session$sendCustomMessage(paste0("toggleMenu_", inputId), TRUE)
 }
 
+KaTeX_html_dependency <- function(){
+  htmlDependency(
+    name = "katex",
+    version = "0.15.1",
+    src = "www/KaTeX",
+    package = "shinySelect",
+    script = list(
+      src = "katex.min.js",
+      integrity = "sha384-z1fJDqw8ZApjGO3/unPWUPsIymfsJmyrDVWC8Tv/a1HeOtGmkwNd/7xUS0Xcnvsx",
+      crossorigin = "anonymous",
+      defer = ""
+    ),
+#    stylesheet = "katex.min.css"
+    stylesheet = list(
+      href = "katex.min.css",
+      integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs",
+      crossorigin="anonymous"
+    )
+  )
+}
 
 #' <Add Title>
 #'
@@ -278,7 +324,8 @@ selectControlInput <- function(
         script = "selectControl.js",
         stylesheet = "selectControl.css"
       ),
-      fa_html_dependency()
+      fa_html_dependency(),
+      KaTeX_html_dependency()
     ),
     default = as.list(values), # useless!
     list(
