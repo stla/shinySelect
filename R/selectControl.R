@@ -165,6 +165,8 @@ toggleMenu <- function(session, inputId){
 selectControlInput <- function(
   inputId, label, choices, selected = NULL, multiple = FALSE,
   sortable = FALSE, optionsStyles = list(), controlStyles = list(),
+  multiValueStyles = list(), multiValueLabelStyles = list(),
+  multiValueRemoveStyles = list(),
   containerClass = "mt-4 col-md-6 col-offset-4", animated = FALSE,
   displayGroupSizes = TRUE, closeMenuOnSelect = !multiple,
   ignoreCaseOnFilter = TRUE, ignoreAccentsOnFilter = TRUE
@@ -173,6 +175,9 @@ selectControlInput <- function(
   stopifnot(isBoolean(sortable))
   stopifnot(isEmpty(optionsStyles) || isNamedList(optionsStyles))
   stopifnot(isEmpty(controlStyles) || isNamedList(controlStyles))
+  stopifnot(isEmpty(multiValueStyles) || isNamedList(multiValueStyles))
+  stopifnot(isEmpty(multiValueLabelStyles) || isNamedList(multiValueLabelStyles))
+  stopifnot(isEmpty(multiValueRemoveStyles) || isNamedList(multiValueRemoveStyles))
   stopifnot(isBoolean(animated))
   stopifnot(isBoolean(displayGroupSizes))
   stopifnot(isBoolean(closeMenuOnSelect))
@@ -282,6 +287,9 @@ selectControlInput <- function(
       label = label,
       optionsStyles = optionsStyles %OR% emptyNamedList,
       controlStyles = controlStyles %OR% emptyNamedList,
+      multiValueStyles = multiValueStyles %OR% emptyNamedList,
+      multiValueLabelStyles = multiValueLabelStyles %OR% emptyNamedList,
+      multiValueRemoveStyles = multiValueRemoveStyles %OR% emptyNamedList,
       grouped = groupedOptions,
       isMulti = multiple,
       sortable = sortable,

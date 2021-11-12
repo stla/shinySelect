@@ -142,6 +142,10 @@ class SelectControl extends React.PureComponent {
     }
     console.log("obj", obj);
     const controlStyles = this.props.controlStyles;
+    const multiValueStyles = this.props.multiValueStyles;
+    const multiValueLabelStyles = this.props.multiValueLabelStyles;
+    const multiValueRemoveStyles = this.props.multiValueRemoveStyles;
+
 
     let animatedComponents = null;
     if (this.props.animated) {
@@ -164,8 +168,21 @@ class SelectControl extends React.PureComponent {
       },
       control: (provided) => ({
         ...provided,
-        ...controlStyles,
-        marginTop: "0"
+        ...controlStyles
+      }),
+      multiValue: (provided, { data }) => {
+        return {
+          ...provided,
+          ...multiValueStyles
+        };
+      },
+      multiValueLabel: (provided, { data }) => ({
+        ...provided,
+        ...multiValueLabelStyles
+      }),
+      multiValueRemove: (provided, { data }) => ({
+        ...provided,
+        ...multiValueRemoveStyles
       })
     };
 
@@ -412,6 +429,9 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
       setShinyValue={setValue}
       optionsStyles={configuration.optionsStyles}
       controlStyles={configuration.controlStyles}
+      multiValueStyles={configuration.multiValueStyles}
+      multiValueLabelStyles={configuration.multiValueLabelStyles}
+      multiValueRemoveStyles={configuration.multiValueRemoveStyles}
       isMulti={configuration.isMulti}
       sortable={configuration.sortable}
       animated={configuration.animated}

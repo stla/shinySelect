@@ -23,10 +23,26 @@ styles <- list(
   color = list(selected = "lime", otherwise = "pink"),
   backgroundColor = list(selected = "cyan", otherwise = "seashell")
 )
+controlStyles = list(
+  marginTop = "0"
+)
+multiValueStyles = list(
+  backgroundColor = "orange"
+)
+multiValueLabelStyles = list(
+  fontStyle = "italic"
+)
+multiValueRemoveStyles = list(
+  color = "hotpink",
+  ":hover" = list(
+    backgroundColor = "navy",
+    color = "white"
+  )
+)
 
-CSS <- '
-div[class$="-menu"][id^="react-select"] {position: static}
-div[class$="-control"] + div {position: static}'
+# CSS <- '
+# div[class$="-menu"][id^="react-select"] {position: static}
+# div[class$="-control"] + div {position: static}'
 
 ui <- fluidPage(
   theme = bs_theme(version = 4),
@@ -38,6 +54,10 @@ ui <- fluidPage(
     "inputid", label = tags$h1("Make a choice", style="color: red;"),
     containerClass = NULL,
     optionsStyles = styles,
+    controlStyles = controlStyles,
+    multiValueStyles = multiValueStyles,
+    multiValueLabelStyles = multiValueLabelStyles,
+    multiValueRemoveStyles = multiValueRemoveStyles,
     choices = states,
     selected = list("NY", "CT"),
     multiple = TRUE,
