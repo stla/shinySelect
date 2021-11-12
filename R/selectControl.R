@@ -189,12 +189,12 @@ KaTeX_html_dependency <- function(){
       crossorigin = "anonymous",
       defer = ""
     ),
-#    stylesheet = "katex.min.css"
-    stylesheet = list(
-      href = "katex.min.css",
-      integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs",
-      crossorigin="anonymous"
-    )
+    stylesheet = "katex.min.css"
+    # stylesheet = list(
+    #   href = "katex.min.css",
+    #   integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs",
+    #   crossorigin="anonymous"
+    # )
   )
 }
 
