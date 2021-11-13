@@ -9,3 +9,4 @@
 ^inst/essais$
 ^LICENSE$
 ^yarn-error\.log$
+^inst/screenshots$
