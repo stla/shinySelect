@@ -7,6 +7,8 @@ import {
   SortableElement,
   SortableHandle,
 } from 'react-sortable-hoc';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // -------------------------------------------------------------------------- //
 function arrayMove(array, from, to) {
@@ -268,6 +270,7 @@ class SelectControl extends React.PureComponent {
 
         return (
           <div className={this.props.containerClass}>
+            <ToastContainer />
             {labelTag}
             <SortableSelect
               useDragHandle
@@ -299,6 +302,7 @@ class SelectControl extends React.PureComponent {
 
         return (
           <div className={this.props.containerClass}>
+            <ToastContainer />
             {labelTag}
             <Select
               styles={customStyles}
@@ -344,6 +348,7 @@ class SelectControl extends React.PureComponent {
 
         return (
           <div className={this.props.containerClass}>
+            <ToastContainer />
             {labelTag}
             <SortableSelect
               useDragHandle
@@ -373,6 +378,7 @@ class SelectControl extends React.PureComponent {
       } else { // not sortable items ---------------------------------------- //
         return (
           <div className={this.props.containerClass}>
+            <ToastContainer />
             {labelTag}
             <Select
               styles={customStyles}
@@ -460,15 +466,31 @@ reactShinyInput(
   SelectControlInput,
   {
     receiveMessage: function(el, data){
-      this.unsubscribe(el);
+      let toastify = false;
       let config = this.getInputConfiguration(el);
+      if(!config.isMulti && Array.isArray(data.value) && data.value.length > 1){
+        toastify = true;
+      }
       config = $.extend(config, data.config);
+      this.unsubscribe(el);
       this.setInputConfiguration(el, config);
       console.log("config", config);
       if(data.value){
         this.setValue(el, data.value);
       }
       this.render(el);
+      if(toastify){
+        toast.info("Switching to multiple mode", {
+          position: "top-center",
+          autoClose: 9000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          style: {backgroundColor: "black", color: "white", fontFamily: "cursive"}
+        });
+      }
     }
   }
 );

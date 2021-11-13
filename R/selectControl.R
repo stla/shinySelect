@@ -336,46 +336,46 @@ process_choices_selected <- function(choices, selected){
   )
 }
 
-processParameters <- function(
-  label, choices, selected, multiple,
-  sortable, optionsStyles, controlStyles,
-  multiValueStyles, multiValueLabelStyles,
-  multiValueRemoveStyles,
-  containerClass, animated,
-  displayGroupSizes, closeMenuOnSelect,
-  ignoreCaseOnFilter, ignoreAccentsOnFilter
-){
-  if(sortable && !multiple){
-    warning(
-      "Setting `sortable` has no effect if `multiple = FALSE`."
-    )
-    sortable <- FALSE
-  }
-  emptyNamedList <- `names<-`(list(), character(0L))
-  list(
-    containerClass = containerClass,
-    label = label,
-    optionsStyles = optionsStyles %OR% emptyNamedList,
-    controlStyles = controlStyles %OR% emptyNamedList,
-    multiValueStyles = multiValueStyles %OR% emptyNamedList,
-    multiValueLabelStyles = multiValueLabelStyles %OR% emptyNamedList,
-    multiValueRemoveStyles = multiValueRemoveStyles %OR% emptyNamedList,
-    grouped = groupedOptions,
-    isMulti = multiple,
-    sortable = sortable,
-    animated = animated,
-    options = options,
-    htmlGroups = attr(choices, "htmlgroups"),
-    htmlLabels = attr(choices, "htmllabels"),
-    selected = selected,
-    displayGroupSizes = displayGroupSizes,
-    closeMenuOnSelect = closeMenuOnSelect,
-    filterConfig = list(
-      ignoreCase    = ignoreCaseOnFilter,
-      ignoreAccents = ignoreAccentsOnFilter
-    )
-  )
-}
+# processParameters <- function(
+#   label, choices, selected, multiple,
+#   sortable, optionsStyles, controlStyles,
+#   multiValueStyles, multiValueLabelStyles,
+#   multiValueRemoveStyles,
+#   containerClass, animated,
+#   displayGroupSizes, closeMenuOnSelect,
+#   ignoreCaseOnFilter, ignoreAccentsOnFilter
+# ){
+#   if(sortable && !multiple){
+#     warning(
+#       "Setting `sortable` has no effect if `multiple = FALSE`."
+#     )
+#     sortable <- FALSE
+#   }
+#   emptyNamedList <- `names<-`(list(), character(0L))
+#   list(
+#     containerClass = containerClass,
+#     label = label,
+#     optionsStyles = optionsStyles %OR% emptyNamedList,
+#     controlStyles = controlStyles %OR% emptyNamedList,
+#     multiValueStyles = multiValueStyles %OR% emptyNamedList,
+#     multiValueLabelStyles = multiValueLabelStyles %OR% emptyNamedList,
+#     multiValueRemoveStyles = multiValueRemoveStyles %OR% emptyNamedList,
+#     grouped = groupedOptions,
+#     isMulti = multiple,
+#     sortable = sortable,
+#     animated = animated,
+#     options = options,
+#     htmlGroups = attr(choices, "htmlgroups"),
+#     htmlLabels = attr(choices, "htmllabels"),
+#     selected = selected,
+#     displayGroupSizes = displayGroupSizes,
+#     closeMenuOnSelect = closeMenuOnSelect,
+#     filterConfig = list(
+#       ignoreCase    = ignoreCaseOnFilter,
+#       ignoreAccents = ignoreAccentsOnFilter
+#     )
+#   )
+# }
 
 
 
@@ -825,7 +825,7 @@ selectControlInput <- function(
       fa_html_dependency(),
       KaTeX_html_dependency()
     ),
-    default = as.list(values), # useless!
+    default = as.list(values), # useless! -no
     # LIST,
     list(
       shinyId = inputId,
@@ -855,9 +855,18 @@ selectControlInput <- function(
   )
 }
 
-#' <Add Title>
+#' @title Update a select control widget
+#' @description Change the value of a select control input.
 #'
-#' <Add Description>
+#' @param session the Shiny \code{session} object
+#' @param inputId the id of the select control widget to be updated
+#' @param label new value for the label
+#' @param choices this argument can be used to change the choices, but it is
+#'   also required if one does not want to change it but one wants to change
+#'   the selected values
+#' @param selected new value(s) for the selected items
+#'
+#' @return No returned value, called for side effect.
 #'
 #' @export
 updateSelectControlInput <- function(
@@ -881,6 +890,9 @@ updateSelectControlInput <- function(
   if(identical(value, NA)){
     message <- list(config = config)
   }else{
+    if(length(value) > 1L){
+      config <- c(config, list(isMulti = TRUE))
+    }
     message <- list(config = config, value = value)
   }
   session$sendInputMessage(inputId, message)
