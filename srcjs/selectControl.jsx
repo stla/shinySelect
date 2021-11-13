@@ -140,8 +140,6 @@ class SelectControl extends React.PureComponent {
 
   render() {
 
-    console.log("props", this.props);
-
     const toggleMenuIsOpen = () => {
       const menuIsOpen = this.state.menuIsOpen;
       this.setState({ menuIsOpen: !menuIsOpen });
@@ -434,7 +432,7 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
       selections.push(group[valueIndices]);
     }
   }
-  console.log("selections", selections);
+
   return (
     <SelectControl
       shinyId={configuration.shinyId}
@@ -474,7 +472,6 @@ reactShinyInput(
       config = $.extend(config, data.config);
       this.unsubscribe(el);
       this.setInputConfiguration(el, config);
-      console.log("config", config);
       if(data.value){
         this.setValue(el, data.value);
       }
@@ -494,11 +491,3 @@ reactShinyInput(
     }
   }
 );
-
-
-// Shiny.addCustomMessageHandler("update_" + "select", function(x){
-//   let config = JSON.parse($("#select_configuration").html());
-//   config = $.extend(config, x);
-//   defaultReceiveMessage(document.getElementById("select"), { configuration: config, value: "XXX" })
-// });
-
