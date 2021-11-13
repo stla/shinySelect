@@ -68,7 +68,6 @@ function formatOptionGroup(data, htmlGroups) {
       data[i].label = parse(katex.renderToString(decodeURI(toparse.__katex)));
     }else{
       data[i].label = parse(unescapeHtml(decodeURI(toparse)));
-      console.log(data[i].label);
     }
   }
 }
@@ -96,7 +95,7 @@ const getStrings = (option) => {
   if(typeof label === "string"){
     return label;
   }
-  if(React.isValidElement(label)){
+  if(React.isValidElement(label) && Array.isArray(label.props.children)){
     const strings = label.props.children.filter(x => typeof x === "string");
     return strings.join(" ");
   }
@@ -138,6 +137,9 @@ class SelectControl extends React.PureComponent {
   };
 
   render() {
+
+    console.log("props", this.props);
+
     const toggleMenuIsOpen = () => {
       const menuIsOpen = this.state.menuIsOpen;
       this.setState({ menuIsOpen: !menuIsOpen });
@@ -150,7 +152,7 @@ class SelectControl extends React.PureComponent {
     const filterConfig = createFilter(
       $.extend(this.props.filterConfig, {stringify: getStrings})
     );
-console.log(filterConfig);
+
     let obj = {};
     let optionsStyles = {};
     if (isNotEmpty(this.props.optionsStyles)) {
@@ -426,6 +428,7 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
       selections.push(group[valueIndices]);
     }
   }
+  console.log("selections", selections);
   return (
     <SelectControl
       shinyId={configuration.shinyId}
@@ -454,5 +457,26 @@ const SelectControlInput = ({ configuration, value, setValue }) => {
 reactShinyInput(
   ".selectControl",
   "shinySelect.selectControl",
-  SelectControlInput
+  SelectControlInput,
+  {
+    receiveMessage: function(el, data){
+      this.unsubscribe(el);
+      let config = this.getInputConfiguration(el);
+      config = $.extend(config, data.config);
+      this.setInputConfiguration(el, config);
+      console.log("config", config);
+      if(data.value){
+        this.setValue(el, data.value);
+      }
+      this.render(el);
+    }
+  }
 );
+
+
+// Shiny.addCustomMessageHandler("update_" + "select", function(x){
+//   let config = JSON.parse($("#select_configuration").html());
+//   config = $.extend(config, x);
+//   defaultReceiveMessage(document.getElementById("select"), { configuration: config, value: "XXX" })
+// });
+

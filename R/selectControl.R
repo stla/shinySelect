@@ -247,6 +247,137 @@ KaTeX_html_dependency <- function(){
   )
 }
 
+process_label <- function(label){
+  if(inherits(label, "shiny.tag")){
+    label <- HTML(as.character(label))
+  }
+  if(inherits(label, "html")){
+    label <- list("__html" = URLencode(label))
+  }
+  if(!isMarkedHTML(label) && !is.null(label) && !isString(label)){
+    stop(
+      "The `label` argument must be `NULL`, a character string, or a HTML element."
+    )
+  }
+  label
+}
+
+process_choices_selected <- function(choices, selected){
+  if(!is.null(selected)){
+    check <- tryCatch({
+      all(vapply(selected, isString, logical(1L)))
+    }, error = function(e) FALSE)
+    if(!check){
+      stop(
+        "The `selected` argument must be a vector or a list of character values."
+      )
+    }
+  }
+  groupedOptions <- areGroupedOptions(choices)
+  options <- if(groupedOptions){
+    makeGroupedOptions(choices)
+  }else{
+    makeSingleOptions(choices)
+  }
+  if(!is.null(selected)){
+    nselected <- length(selected)
+    # if(!multiple && nselected > 1L){
+    #   stop(
+    #     "You cannot provide more than one value in the `selected` argument if ",
+    #     "you don't set the `multiple` argument to `TRUE`."
+    #   )
+    # }
+    selected <- getSelectedIndex(options, groupedOptions, selected)
+    if(!groupedOptions && anyNA(selected[["selected"]])){
+      if(nselected == 1L){
+        stop(
+          "The value you provided in the `selected` argument cannot be found."
+        )
+      }else{
+        stop(
+          "We cannot find all the values you provided in the `selected` argument."
+        )
+      }
+    }
+    if(groupedOptions){
+      nfound <-
+        sum(vapply(selected, function(x) length(x[["selected"]]), integer(1L)))
+      if(nfound < nselected){
+        if(nselected == 1L){
+          stop(
+            "The value you provided in the `selected` argument cannot be found."
+          )
+        }else{
+          stop(
+            "We cannot find all the values you provided in the `selected` argument."
+          )
+        }
+      }
+      values <- c()
+      for(i in seq_along(selected)){
+        group <- options[[selected[[i]][["group"]] + 1L]][["options"]]
+        indices <- selected[[i]][["selected"]] + 1L
+        values <- c(
+          values,
+          vapply(group[indices], `[[`, character(1L), "value")
+        )
+      }
+    }else{
+      indices <- selected[["selected"]] + 1L
+      values <- vapply(options[indices], `[[`, character(1L), "value")
+    }
+  }
+  list(
+    grouped = groupedOptions,
+    options = options,
+    htmlGroups = attr(choices, "htmlgroups"),
+    htmlLabels = attr(choices, "htmllabels"),
+    selected = selected
+  )
+}
+
+processParameters <- function(
+  label, choices, selected, multiple,
+  sortable, optionsStyles, controlStyles,
+  multiValueStyles, multiValueLabelStyles,
+  multiValueRemoveStyles,
+  containerClass, animated,
+  displayGroupSizes, closeMenuOnSelect,
+  ignoreCaseOnFilter, ignoreAccentsOnFilter
+){
+  if(sortable && !multiple){
+    warning(
+      "Setting `sortable` has no effect if `multiple = FALSE`."
+    )
+    sortable <- FALSE
+  }
+  emptyNamedList <- `names<-`(list(), character(0L))
+  list(
+    containerClass = containerClass,
+    label = label,
+    optionsStyles = optionsStyles %OR% emptyNamedList,
+    controlStyles = controlStyles %OR% emptyNamedList,
+    multiValueStyles = multiValueStyles %OR% emptyNamedList,
+    multiValueLabelStyles = multiValueLabelStyles %OR% emptyNamedList,
+    multiValueRemoveStyles = multiValueRemoveStyles %OR% emptyNamedList,
+    grouped = groupedOptions,
+    isMulti = multiple,
+    sortable = sortable,
+    animated = animated,
+    options = options,
+    htmlGroups = attr(choices, "htmlgroups"),
+    htmlLabels = attr(choices, "htmllabels"),
+    selected = selected,
+    displayGroupSizes = displayGroupSizes,
+    closeMenuOnSelect = closeMenuOnSelect,
+    filterConfig = list(
+      ignoreCase    = ignoreCaseOnFilter,
+      ignoreAccents = ignoreAccentsOnFilter
+    )
+  )
+}
+
+
 
 #' @title Select control widget
 #' @description Create a select control widget to be included in a Shiny UI.
@@ -586,6 +717,17 @@ selectControlInput <- function(
   stopifnot(is.null(containerClass) || isString(containerClass))
   stopifnot(isBoolean(ignoreCaseOnFilter))
   stopifnot(isBoolean(ignoreAccentsOnFilter))
+
+  # LIST <- processParameters(
+  #   label, choices, selected, multiple,
+  #   sortable, optionsStyles, controlStyles,
+  #   multiValueStyles, multiValueLabelStyles,
+  #   multiValueRemoveStyles,
+  #   containerClass, animated,
+  #   displayGroupSizes, closeMenuOnSelect,
+  #   ignoreCaseOnFilter, ignoreAccentsOnFilter
+  # )
+  # LIST[["shinyId"]] <- inputId
   if(inherits(label, "shiny.tag")){
     label <- HTML(as.character(label))
   }
@@ -684,6 +826,7 @@ selectControlInput <- function(
       KaTeX_html_dependency()
     ),
     default = as.list(values), # useless!
+    # LIST,
     list(
       shinyId = inputId,
       containerClass = containerClass,
@@ -717,8 +860,28 @@ selectControlInput <- function(
 #' <Add Description>
 #'
 #' @export
-updateSelectControlInput <- function(session, inputId, value, configuration = NULL) {
-  message <- list(value = value)
-  if (!is.null(configuration)) message$configuration <- configuration
-  session$sendInputMessage(inputId, message);
+updateSelectControlInput <- function(
+  session, inputId, #value,
+  label = NULL, choices = NULL, selected = NULL
+){
+  value <- NA
+  label <- process_label(label)
+  if(!is.null(choices)){
+    LIST <- process_choices_selected(choices, selected)
+    value <- selected
+  }else{
+    LIST <- NULL
+  }
+  if(!is.null(selected) && is.null(choices)){
+    warning(
+      "You have to provide `choices` if you want to update `selected`."
+    )
+  }
+  config <- c(list(label = label), LIST)
+  if(identical(value, NA)){
+    message <- list(config = config)
+  }else{
+    message <- list(config = config, value = value)
+  }
+  session$sendInputMessage(inputId, message)
 }
