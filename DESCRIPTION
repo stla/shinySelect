@@ -1,10 +1,15 @@
 Package: shinySelect
-Title: What the Package Does (One Line, Title Case)
+Title: A Wrapper of the 'react-select' Library
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Authors@R: c(
+    person("Stéphane", "Laurent", email = "laurent_step@outlook.fr", 
+            role = c("aut", "cre")),
+    person("Jed", "Watson", 
+            role = "cph", comment = "author of the 'react-select' library"),
+    person("Clauderic", "Demers", 
+            role = "cph", comment = "author of the 'react-sortable-hoc' library")
+  )
+Description: Provides a select control widget for 'Shiny'. It is easily customizable, and one can easily use HTML in the items and KaTeX to type mathematics.
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.2
@@ -17,3 +22,5 @@ Imports:
 Suggests:
     bslib,
     jsTreeR
+URL: https://github.com/stla/shinySelect
+BugReports: https://github.com/stla/shinySelect/issues
