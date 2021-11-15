@@ -808,6 +808,8 @@ selectControlInput <- function(
       indices <- selected[["selected"]] + 1L
       values <- vapply(options[indices], `[[`, character(1L), "value")
     }
+  }else{
+    values <- NULL
   }
   emptyNamedList <- `names<-`(list(), character(0L))
   createReactShinyInput(
@@ -843,7 +845,7 @@ selectControlInput <- function(
       options = options,
       htmlGroups = attr(choices, "htmlgroups"),
       htmlLabels = attr(choices, "htmllabels"),
-      selected = selected,
+      selected = as.list(selected),
       displayGroupSizes = displayGroupSizes,
       closeMenuOnSelect = closeMenuOnSelect,
       filterConfig = list(
