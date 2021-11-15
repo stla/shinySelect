@@ -54,7 +54,7 @@ a vector or a list of values if \code{multiple = TRUE}}
 to remove an item}
 
 \item{containerClass}{CSS class(es) for the container; the default value
-assumes you used the 'bslib' package with
+assumes you use the 'bslib' package with
 \code{\link[bslib:bs_theme]{bs_theme(version = 4)}}}
 
 \item{animated}{Boolean; this has an effect only when \code{multiple = TRUE}:
@@ -70,7 +70,7 @@ selection}
 an option}
 
 \item{ignoreAccentsOnFilter}{Boolean, whether to ignore the accents when
-searchingan option}
+searching an option}
 }
 \value{
 An input element that can be included in a Shiny UI definition.

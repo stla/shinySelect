@@ -221,7 +221,7 @@ isNamedList <- function(x){
 #' @param session the Shiny \code{session} object
 #' @param inputId the input id of the select control
 #'
-#' @return No value; called for effect size.
+#' @return No value; called for side effect.
 #' @export
 #'
 #' @examples See the last example of 'selectControlInput'.
@@ -400,7 +400,7 @@ process_choices_selected <- function(choices, selected){
 #' @param multiValueRemoveStyles styles for the box containing the cross used
 #'   to remove an item
 #' @param containerClass CSS class(es) for the container; the default value
-#'   assumes you used the 'bslib' package with
+#'   assumes you use the 'bslib' package with
 #'   \code{\link[bslib:bs_theme]{bs_theme(version = 4)}}
 #' @param animated Boolean; this has an effect only when \code{multiple = TRUE}:
 #'   the removal of the items is animated
@@ -411,7 +411,7 @@ process_choices_selected <- function(choices, selected){
 #' @param ignoreCaseOnFilter Boolean, whether to ignore the case when searching
 #'   an option
 #' @param ignoreAccentsOnFilter Boolean, whether to ignore the accents when
-#'   searchingan option
+#'   searching an option
 #'
 #' @return An input element that can be included in a Shiny UI definition.
 #' @export
@@ -860,7 +860,8 @@ selectControlInput <- function(
 #'
 #' @param session the Shiny \code{session} object
 #' @param inputId the id of the select control widget to be updated
-#' @param label new value for the label
+#' @param label new value for the label; \code{NULL} removes the label, set
+#'   \code{label = NA} if you don't want to change the label
 #' @param choices this argument can be used to change the choices, but it is
 #'   also required if one does not want to change it but one wants to change
 #'   the selected values
@@ -870,11 +871,12 @@ selectControlInput <- function(
 #'
 #' @export
 updateSelectControlInput <- function(
-  session, inputId, #value,
-  label = NULL, choices = NULL, selected = NULL
+  session, inputId, label = NA, choices = NULL, selected = NULL
 ){
   value <- NA
-  label <- process_label(label)
+  if(!identical(label, NA)){
+    label <- process_label(label)
+  }
   if(!is.null(choices)){
     LIST <- process_choices_selected(choices, selected)
     value <- selected
@@ -886,7 +888,11 @@ updateSelectControlInput <- function(
       "You have to provide `choices` if you want to update `selected`."
     )
   }
-  config <- c(list(label = label), LIST)
+  if(identical(label, NA)){
+    config <- LIST
+  }else{
+    config <- c(list(label = label), LIST)
+  }
   if(identical(value, NA)){
     message <- list(config = config)
   }else{

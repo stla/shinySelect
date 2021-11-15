@@ -7,7 +7,7 @@
 updateSelectControlInput(
   session,
   inputId,
-  label = NULL,
+  label = NA,
   choices = NULL,
   selected = NULL
 )
@@ -17,7 +17,8 @@ updateSelectControlInput(
 
 \item{inputId}{the id of the select control widget to be updated}
 
-\item{label}{new value for the label}
+\item{label}{new value for the label; \code{NULL} removes the label, set
+\code{label = NA} if you don't want to change the label}
 
 \item{choices}{this argument can be used to change the choices, but it is
 also required if one does not want to change it but one wants to change

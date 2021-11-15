@@ -12,7 +12,7 @@ toggleMenu(session, inputId)
 \item{inputId}{the input id of the select control}
 }
 \value{
-No value; called for effect size.
+No value; called for side effect.
 }
 \description{
 Toggle (open/close) a select control widget.

@@ -10,3 +10,4 @@
 ^LICENSE$
 ^yarn-error\.log$
 ^inst/screenshots$
+^cran-comments\.md$
