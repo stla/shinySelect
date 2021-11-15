@@ -18,7 +18,8 @@ Imports:
     reactR,
     shiny,
     utils,
-    fontawesome
+    fontawesome,
+    stats
 Suggests:
     bslib,
     jsTreeR

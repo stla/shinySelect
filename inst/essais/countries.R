@@ -55,7 +55,7 @@ ui <- fluidPage(
     sidebarPanel(
       selectControlInput(
         "select",
-        label = tags$h3("Choose some countries", style="color: red;"),
+        label = tags$h3("Choose some countries", style="color: crimson;"),
         containerClass = NULL,
         choices = countries,
         selected = c("Tonga", "Austria"),

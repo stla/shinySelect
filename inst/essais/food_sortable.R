@@ -26,7 +26,7 @@ ui <- fluidPage(
   titlePanel("Sortable example"),
   selectControlInput(
     "select",
-    label = tags$h1("Make a choice", style="color: red;"),
+    label = tags$h2("What do you want to eat?", style="color: darkred;"),
     optionsStyles = styles,
     choices = food,
     selected = "hamburger",

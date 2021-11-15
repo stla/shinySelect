@@ -18,5 +18,5 @@ No value; called for side effect.
 Toggle (open/close) a select control widget.
 }
 \examples{
-See the last example of 'selectControlInput'.
+# See the last example of 'selectControlInput'.
 }

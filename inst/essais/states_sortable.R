@@ -66,11 +66,12 @@ ui <- fluidPage(
   tags$head(
     tags$style(HTML(CSS))
   ),
-  titlePanel("Custom styles example"),
+  tags$div(style = "height:50vh"),
+  #titlePanel("Custom styles example"),
   splitLayout(
     selectControlInput(
       "select",
-      label = tags$h1("Choose some states", style="color: red;"),
+      label = NULL,#tags$h1("Choose some states", style="color: red;"),
       containerClass = NULL,
       optionsStyles = styles,
       controlStyles = controlStyles,
@@ -79,7 +80,7 @@ ui <- fluidPage(
       multiValueRemoveStyles = multiValueRemoveStyles,
       choices = states,
       selected = "CT",
-      multiple = FALSE,
+      multiple = TRUE,
       sortable = TRUE,
       animated = TRUE
     ),

@@ -25,6 +25,7 @@ Create an object for choices resorting to HTML.
 \examples{
 library(shinySelect)
 library(fontawesome)
+library(shiny)
 food <- HTMLchoices(
   labels = list(
     tags$span(fa_i("hamburger"), "Hamburger"),

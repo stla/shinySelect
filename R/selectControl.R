@@ -22,6 +22,8 @@ makeGroupedOptions <- function(choices){
   })
 }
 
+#' @importFrom stats na.exclude na.omit
+#' @noRd
 getSelectedIndex <- function(options, grouped, selected){
   if(!grouped){
     values <- vapply(options, `[[`, character(1L), "value")
@@ -110,6 +112,7 @@ isKaTeX <- function(x){
 #' @importFrom utils URLencode
 #'
 #' @examples library(shinySelect)
+#' library(shiny)
 #' states <- HTMLgroupedChoices(
 #'   groups = lapply(list("East Coast", "West Coast", "Midwest"), function(x){
 #'     tags$h2(x, style="text-decoration: underline")
@@ -177,6 +180,7 @@ HTMLgroupedChoices <- function(groups, labels, values){
 #'
 #' @examples library(shinySelect)
 #' library(fontawesome)
+#' library(shiny)
 #' food <- HTMLchoices(
 #'   labels = list(
 #'     tags$span(fa_i("hamburger"), "Hamburger"),
@@ -224,7 +228,7 @@ isNamedList <- function(x){
 #' @return No value; called for side effect.
 #' @export
 #'
-#' @examples See the last example of 'selectControlInput'.
+#' @examples # See the last example of 'selectControlInput'.
 toggleMenu <- function(session, inputId){
   session$sendCustomMessage(paste0("toggleMenu_", inputId), TRUE)
 }

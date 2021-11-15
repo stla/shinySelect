@@ -25,6 +25,7 @@ Create an object for grouped choices resorting to HTML.
 }
 \examples{
 library(shinySelect)
+library(shiny)
 states <- HTMLgroupedChoices(
   groups = lapply(list("East Coast", "West Coast", "Midwest"), function(x){
     tags$h2(x, style="text-decoration: underline")

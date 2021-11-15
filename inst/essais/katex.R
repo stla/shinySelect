@@ -3,8 +3,16 @@ library(shinySelect)
 library(bslib)
 
 choices <- HTMLchoices(
-  values = list("alpha", "beta", "gammma"),
-  labels = list(katex("\\alpha"), katex("\\beta"), katex("\\gamma"))
+  values = list(
+    "Euler equality",
+    "Gaussian integral",
+    "Knopp equality"
+  ),
+  labels = list(
+    katex("\\frac{\\pi}{2} = 1 + \\frac{1}{3} + \\frac{1\\times 2}{3\\times 5} + \\cdots + \\frac{n!}{3\\times 5 \\times 7 \\times \\cdots \\times (2n+1)} + \\cdots"),
+    katex("\\int_{-\\infty}^{+\\infty}e^{-x^2}dx=\\sqrt{\\pi}"),
+    katex("\\frac{\\pi^2}{16}=\\sum_{k=0}^\\infty\\frac{{(-1)}^k}{k+1}\\left(1+\\frac{1}{3}+\\cdots+\\frac{1}{2k+1}\\right)")
+  )
 )
 
 ui <- fluidPage(
@@ -12,9 +20,9 @@ ui <- fluidPage(
   titlePanel("KaTeX example"),
   selectControlInput(
     "select",
-    label = tags$h1("Make a choice", style="color: red;"),
+    label = tags$h2("Choose a formula", style="color: firebrick;"),
     choices = choices,
-    selected = "alpha",
+    selected = "Euler equality",
     multiple = FALSE,
     animated = TRUE
   ),
