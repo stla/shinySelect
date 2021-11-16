@@ -1,3 +1,3 @@
-# shinySelect 0.0.0.9000
+# shinySelect 1.0.0
 
 First release.
