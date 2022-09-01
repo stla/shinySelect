@@ -85,7 +85,7 @@ library(shinySelect)
 library(bslib)
 
 choices <- HTMLchoices(
-  values = list("alpha", "beta", "gammma"),
+  values = list("alpha", "beta", "gamma"),
   labels = list(katex("\\\\alpha"), katex("\\\\beta"), katex("\\\\gamma"))
 )
 
@@ -97,8 +97,7 @@ ui <- fluidPage(
     label = tags$h1("Make a choice", style="color: red;"),
     choices = choices,
     selected = "alpha",
-    multiple = FALSE,
-    animated = TRUE
+    multiple = FALSE
   ),
   br(),
   verbatimTextOutput("textOutput")

@@ -18,7 +18,7 @@ Create an object to be decoded by KaTeX.
 \examples{
 library(shinySelect)
 choices <- HTMLchoices(
-  values = list("alpha", "beta", "gammma"),
+  values = list("alpha", "beta", "gamma"),
   labels = list(katex("\\\\alpha"), katex("\\\\beta"), katex("\\\\gamma"))
 )
 }

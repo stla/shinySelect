@@ -84,7 +84,7 @@ isMarkedHTML <- function(x){
 #'
 #' @examples library(shinySelect)
 #' choices <- HTMLchoices(
-#'   values = list("alpha", "beta", "gammma"),
+#'   values = list("alpha", "beta", "gamma"),
 #'   labels = list(katex("\\alpha"), katex("\\beta"), katex("\\gamma"))
 #' )
 katex <- function(x){
@@ -430,7 +430,7 @@ process_choices_selected <- function(choices, selected){
 #' library(bslib)
 #'
 #' choices <- HTMLchoices(
-#'   values = list("alpha", "beta", "gammma"),
+#'   values = list("alpha", "beta", "gamma"),
 #'   labels = list(katex("\\alpha"), katex("\\beta"), katex("\\gamma"))
 #' )
 #'
@@ -442,8 +442,7 @@ process_choices_selected <- function(choices, selected){
 #'     label = tags$h1("Make a choice", style="color: red;"),
 #'     choices = choices,
 #'     selected = "alpha",
-#'     multiple = FALSE,
-#'     animated = TRUE
+#'     multiple = FALSE
 #'   ),
 #'   br(),
 #'   verbatimTextOutput("textOutput")

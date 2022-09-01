@@ -17,7 +17,7 @@ ui <- fluidPage(
     label = tags$h1("Make a choice", style="color: red;"),
     choices = choices,
     selected = "alpha",
-    multiple = TRUE,
+    multiple = FALSE,
     animated = TRUE
   ),
   br(),
