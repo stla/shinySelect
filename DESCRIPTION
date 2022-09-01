@@ -1,27 +1,28 @@
 Package: shinySelect
 Title: A Wrapper of the 'react-select' Library
-Version: 1.0.9000
+Version: 1.1.0
 Authors@R: c(
-    person("Stéphane", "Laurent", email = "laurent_step@outlook.fr", 
-            role = c("aut", "cre")),
-    person("Jed", "Watson", 
-            role = "cph", comment = "author of the 'react-select' library"),
-    person("Clauderic", "Demers", 
-            role = "cph", comment = "author of the 'react-sortable-hoc' library")
+    person("Stéphane", "Laurent", , "laurent_step@outlook.fr", role = c("aut", "cre")),
+    person("Jed", "Watson", role = "cph",
+           comment = "author of the 'react-select' library"),
+    person("Clauderic", "Demers", role = "cph",
+           comment = "author of the 'react-sortable-hoc' library")
   )
-Description: Provides a select control widget for 'Shiny'. It is easily customizable, and one can easily use HTML in the items and KaTeX to type mathematics.
+Description: Provides a select control widget for 'Shiny'. It is easily
+    customizable, and one can easily use HTML in the items and KaTeX to
+    type mathematics.
 License: GPL-3
-Encoding: UTF-8
-RoxygenNote: 7.2.1
+URL: https://github.com/stla/shinySelect
+BugReports: https://github.com/stla/shinySelect/issues
 Imports: 
+    fontawesome,
     htmltools,
     reactR,
     shiny,
-    utils,
-    fontawesome,
-    stats
+    stats,
+    utils
 Suggests:
     bslib,
     jsTreeR
-URL: https://github.com/stla/shinySelect
-BugReports: https://github.com/stla/shinySelect/issues
+Encoding: UTF-8
+RoxygenNote: 7.2.1
