@@ -158,7 +158,11 @@ class SelectControl extends React.PureComponent {
         selection = this.props.options.find(o => o.value === value[0]);
       }
       console.log(selection);
-      this.setState({ selectedOption: selection });
+      const that = this;
+      setTimeout(function() {
+        that.handleChange(selection);
+      }, 1000);
+      // this.setState({ selectedOption: selection });
       console.log(this.state.selectedOption);
     };
   

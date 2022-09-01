@@ -4,27 +4,16 @@
 \alias{updateSelectControlInput}
 \title{Update a select control widget}
 \usage{
-updateSelectControlInput(
-  session,
-  inputId,
-  label = NA,
-  choices = NULL,
-  selected = NULL
-)
+updateSelectControlInput(session, inputId, choices = NULL, selected = NULL)
 }
 \arguments{
 \item{session}{the Shiny \code{session} object}
 
 \item{inputId}{the id of the select control widget to be updated}
 
-\item{label}{new value for the label; \code{NULL} removes the label, set
-\code{label = NA} if you don't want to change the label}
+\item{choices}{new choices, or \code{NULL}}
 
-\item{choices}{this argument can be used to change the choices, but it is
-also required if one does not want to change it but one wants to change
-the selected values}
-
-\item{selected}{new value(s) for the selected items}
+\item{selected}{new value(s) for the selected items, or \code{NULL}}
 }
 \value{
 No returned value, called for side effect.
