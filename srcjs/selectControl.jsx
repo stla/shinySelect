@@ -144,11 +144,28 @@ class SelectControl extends React.PureComponent {
       const menuIsOpen = this.state.menuIsOpen;
       this.setState({ menuIsOpen: !menuIsOpen });
     };
-  
-    Shiny.addCustomMessageHandler("toggleMenu_" + this.props.shinyId, function(x){
+
+    Shiny.addCustomMessageHandler("toggleMenu_" + this.props.shinyId, function(x) {
       toggleMenuIsOpen();
     });
+
+    const updateValue = (value) => {
+      console.log(this.props.options);
+      let selection;
+      if(this.props.isMulti) {
+        selection = this.props.options.filter(o => o.value === value);
+      } else {
+        selection = this.props.options.find(o => o.value === value);
+      }
+      console.log(selection);
+      this.setState({ selectedOption: selection });
+      console.log(this.state.selectedOption);
+    };
   
+    Shiny.addCustomMessageHandler("updateValue_" + this.props.shinyId, function(x) {
+      updateValue(x);
+    });
+
     const filterConfig = createFilter(
       $.extend(this.props.filterConfig, {stringify: getStrings})
     );
@@ -305,6 +322,7 @@ class SelectControl extends React.PureComponent {
             <Select
               styles={customStyles}
               defaultValue={this.props.value}
+              value={this.state.selectedOption}
               onChange={this.handleChange}
               options={this.props.options}
               formatGroupLabel={formatGroupLabel}
@@ -381,6 +399,7 @@ class SelectControl extends React.PureComponent {
             <Select
               styles={customStyles}
               defaultValue={this.props.value}
+              value={this.state.selectedOption}
               onChange={this.handleChange}
               options={this.props.options}
               isMulti={this.props.isMulti}
