@@ -18,11 +18,11 @@ Imports:
     fontawesome,
     htmltools,
     reactR,
-    shiny,
     stats,
     utils
 Suggests:
     bslib,
-    jsTreeR
+    jsTreeR,
+    shiny
 Encoding: UTF-8
 RoxygenNote: 7.2.1
