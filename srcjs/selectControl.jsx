@@ -150,20 +150,15 @@ class SelectControl extends React.PureComponent {
     });
 
     const updateValue = (value) => {
-      console.log(this.props.options);
       let selection;
       if(this.props.isMulti) {
-        selection = this.props.options.filter(o => o.value === value);
+        selection = this.props.options.filter(
+          o => value.indexOf(o.value) > -1
+        );
       } else {
         selection = this.props.options.find(o => o.value === value[0]);
       }
-      console.log(selection);
-      const that = this;
-      setTimeout(function() {
-        that.handleChange(selection);
-      }, 1000);
-      // this.setState({ selectedOption: selection });
-      console.log(this.state.selectedOption);
+      this.handleChange(selection);
     };
   
     Shiny.addCustomMessageHandler("updateValue_" + this.props.shinyId, function(x) {
