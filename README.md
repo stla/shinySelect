@@ -1,5 +1,9 @@
 # shinySelect
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/stla/shinySelect/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/stla/shinySelect/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 A wrapper of the ***react-select*** library, for usage in Shiny.
 
 ___

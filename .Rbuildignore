@@ -11,3 +11,4 @@
 ^yarn-error\.log$
 ^inst/screenshots$
 ^cran-comments\.md$
+^\.github$
