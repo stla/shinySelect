@@ -155,7 +155,7 @@ class SelectControl extends React.PureComponent {
       if(this.props.isMulti) {
         selection = this.props.options.filter(o => o.value === value);
       } else {
-        selection = this.props.options.find(o => o.value === value);
+        selection = this.props.options.find(o => o.value === value[0]);
       }
       console.log(selection);
       this.setState({ selectedOption: selection });

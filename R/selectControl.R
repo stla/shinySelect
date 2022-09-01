@@ -880,32 +880,40 @@ updateSelectControlInput <- function(
   session, inputId, label = NA, choices = NULL, selected = NULL
 ){
   value <- NA
-  if(!identical(label, NA)){
+  if(!identical(label, NA)) {
     label <- process_label(label)
   }
-  if(!is.null(choices)){
-    LIST <- process_choices_selected(choices, selected)
+  if(!is.null(selected)) {
     value <- selected
+  }
+  if(!is.null(choices)) {
+    LIST <- process_choices_selected(choices, selected)
   }else{
     LIST <- NULL
   }
-  if(!is.null(selected) && is.null(choices)){
-    warning(
-      "You have to provide `choices` if you want to update `selected`."
-    )
-  }
-  if(identical(label, NA)){
+  # if(!is.null(selected) && is.null(choices)){
+  #   warning(
+  #     "You have to provide `choices` if you want to update `selected`."
+  #   )
+  # }
+  if(identical(label, NA)) {
     config <- LIST
   }else{
     config <- c(list(label = label), LIST)
   }
-  if(identical(value, NA)){
+  if(identical(value, NA)) {
     message <- list(config = config)
   }else{
-    if(length(value) > 1L){
+    if(length(value) > 1L){ # ? si multi et une seule valeur ?
       config <- c(config, list(isMulti = TRUE))
     }
     message <- list(config = config, value = value)
   }
   session$sendInputMessage(inputId, message)
+  if(!identical(value, NA)) {
+    session$sendCustomMessage(
+      paste0("updateValue_", inputId),
+      as.list(value)
+    )
+  }
 }
