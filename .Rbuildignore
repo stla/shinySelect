@@ -12,3 +12,4 @@
 ^inst/screenshots$
 ^cran-comments\.md$
 ^\.github$
+^CRAN-SUBMISSION$
