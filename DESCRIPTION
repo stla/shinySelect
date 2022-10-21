@@ -1,6 +1,6 @@
 Package: shinySelect
 Title: A Wrapper of the 'react-select' Library
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: c(
     person("Stéphane", "Laurent", , "laurent_step@outlook.fr", role = c("aut", "cre")),
     person("Jed", "Watson", role = "cph",

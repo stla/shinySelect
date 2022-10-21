@@ -158,7 +158,7 @@ HTMLgroupedChoices <- function(groups, labels, values){
   #names(labels) <- as.character(seq_along(labels))
   out <- values
   attr(out, "htmlgroups") <- groups
-  attr(out, "htmllabels") <- newlabels
+  attr(out, "htmllabels") <- lapply(newlabels, as.list)
   out
 }
 
