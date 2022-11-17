@@ -417,6 +417,25 @@ class SelectControl extends React.PureComponent {
 }
 
 // -------------------------------------------------------------------------- //
+function makeSelections(configuration) {
+  const grouped = configuration.grouped;
+  let selected = configuration.selected;
+  if (!Array.isArray(selected)) {
+    selected = [selected];
+  }
+  let options = configuration.options;
+  let selections = [];
+  for (let i = 0; i < selected.length; i++) {
+    let valueIndices = selected[i].selected;
+    if(Array.isArray(valueIndices)){
+      selections = selections.concat(valueIndices.map((j) => (options[j].value)));
+    }else{
+      selections.push(options[valueIndices].value);
+    }
+  }
+  return selections;
+}
+
 const SelectControlInput = ({ configuration, value, setValue }) => {
   let label = configuration.label;
   if (isHTML(label)) {
@@ -490,8 +509,8 @@ reactShinyInput(
       config = $.extend(config, data.config);
       this.unsubscribe(el);
       this.setInputConfiguration(el, config);
-      if(data.value){
-        this.setValue(el, data.value);
+      if(data.config.selected){
+        this.setValue(el, makeSelections(config));
       }
       this.render(el);
       if(toastify){

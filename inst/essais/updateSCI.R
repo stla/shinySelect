@@ -8,6 +8,11 @@ choices <- HTMLchoices(
   labels = list(katex("\\alpha"), katex("\\beta"), katex("\\gamma"))
 )
 
+choices2 <- HTMLchoices(
+  values = list("delta", "beta", "gamma"),
+  labels = list(katex("\\delta"), katex("\\beta"), katex("\\gamma"))
+)
+
 ui <- fluidPage(
   theme = bs_theme(version = 4),
   titlePanel("KaTeX example"),
@@ -17,7 +22,7 @@ ui <- fluidPage(
     label = tags$h1("Make a choice", style="color: red;"),
     choices = choices,
     selected = "alpha",
-    multiple = FALSE,
+    multiple = TRUE,
     animated = TRUE
   ),
   br(),
@@ -29,7 +34,11 @@ server <- function(input, output, session) {
     sprintf("You selected: %s.", input[["select"]])
   })
   observeEvent(input[["update"]], {
-    updateSelectControlInput(session, "select", selected = c("alpha", "beta"))
+    updateSelectControlInput(
+      session, "select", 
+      choices = choices2,
+      selected = list("delta", "beta")
+    )
   })
 }
 

@@ -882,6 +882,6 @@ updateSelectControlInput <- function(
   } else {
     config <- process_choices_selected(choices, selected)
     #config <- c(config, list(isMulti = TRUE))
-    session$sendInputMessage(inputId, message)
+    session$sendInputMessage(inputId, list(config = config))
   }
 }
