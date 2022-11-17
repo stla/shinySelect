@@ -419,18 +419,30 @@ class SelectControl extends React.PureComponent {
 // -------------------------------------------------------------------------- //
 function makeSelections(configuration) {
   const grouped = configuration.grouped;
-  let selected = configuration.selected;
-  if (!Array.isArray(selected)) {
-    selected = [selected];
-  }
-  let options = configuration.options;
+  const options = configuration.options;
+  const selected = configuration.selected;
   let selections = [];
-  for (let i = 0; i < selected.length; i++) {
-    let valueIndices = selected[i].selected;
-    if(Array.isArray(valueIndices)){
-      selections = selections.concat(valueIndices.map((j) => (options[j].value)));
-    }else{
+  if(!grouped) {
+    const valueIndices = selected.selected;
+    if(Array.isArray(valueIndices)) {
+      selections = selections.concat(
+        valueIndices.map((j) => (options[j].value))
+      );
+    } else {
       selections.push(options[valueIndices].value);
+    }
+  } else {
+    for (let i = 0; i < selected.length; i++) {
+      const groupIndex = selected[i].group;
+      const valueIndices = selected[i].selected;
+      const groupOptions = options[groupIndex].options;
+      if(Array.isArray(valueIndices)) {
+        selections = selections.concat(
+          valueIndices.map((j) => (groupOptions[j].value))
+        );
+      } else {
+        selections.push(groupOptions[valueIndices].value);
+      }
     }
   }
   return selections;
