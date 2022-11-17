@@ -1,3 +1,8 @@
+# shinySelect 1.3.0
+
+Fixed `updateSelectControlInput`, which was totally buggy.
+
+
 # shinySelect 1.2.0
 
 There was a bug when there was only one HTML choice in the widget.
