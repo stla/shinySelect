@@ -36,8 +36,8 @@ server <- function(input, output, session) {
   observeEvent(input[["update"]], {
     updateSelectControlInput(
       session, "select", 
-      choices = choices2,
-      selected = list("delta", "beta")
+      choices = NULL,
+      selected = "gamma"
     )
   })
 }

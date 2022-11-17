@@ -151,12 +151,22 @@ class SelectControl extends React.PureComponent {
 
     const updateValue = (value) => {
       let selection;
-      if(this.props.isMulti) {
-        selection = this.props.options.filter(
-          o => value.indexOf(o.value) > -1
-        );
+      if(this.props.grouped) {
+        selection = [];
+        for(let i = 0; i < this.props.options.length; i++) {
+          const sel_i = this.props.options[i].options.filter(
+            o => value.indexOf(o.value) > -1
+          );
+          selection = selection.concat(sel_i);
+        }
       } else {
-        selection = this.props.options.find(o => o.value === value[0]);
+        if(this.props.isMulti) {
+          selection = this.props.options.filter(
+            o => value.indexOf(o.value) > -1
+          );
+        } else {
+          selection = this.props.options.find(o => o.value === value[0]);
+        }
       }
       this.handleChange(selection);
     };

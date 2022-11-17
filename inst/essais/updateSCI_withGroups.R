@@ -23,8 +23,8 @@ ui <- fluidPage(
     "select",
     label = tags$h1("Make a choice", style="color: red;"),
     choices = choices,
-    selected = list("alpha", "G"),
-    multiple = TRUE,
+    selected = list("alpha"),
+    multiple = FALSE,
     animated = TRUE
   ),
   br(),
@@ -38,8 +38,8 @@ server <- function(input, output, session) {
   observeEvent(input[["update"]], {
     updateSelectControlInput(
       session, "select", 
-      choices = choices2,
-      selected = list("delta", "B")
+      choices = NULL,
+      selected = list("B")
     )
   })
 }

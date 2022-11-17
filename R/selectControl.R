@@ -875,6 +875,8 @@ updateSelectControlInput <- function(
   session, inputId, choices = NULL, selected = NULL
 ){
   if(is.null(choices)) {
+    # config <- list(selected = as.list(selected))
+    # session$sendInputMessage(inputId, list(config = config))
     session$sendCustomMessage(
       paste0("updateValue_", inputId),
       as.list(selected)
